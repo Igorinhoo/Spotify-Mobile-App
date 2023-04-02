@@ -19,6 +19,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.app.spotifyapp.Fragments.FirstFragment;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.Image;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -50,77 +51,50 @@ public class MainActivity extends AppCompatActivity {
         alreadyPlayingBox = findViewById(R.id.alreadyPlayingBox);
         alreadyPlayingName = findViewById(R.id.alreadyPlayingName);
         alreadyPlayingImg = findViewById(R.id.alreadyPlayingImg);
-        ConnectToRemote();
 
-//        alreadyPlayingName.setOnClickListener((view -> {
-//            Intent intent = new Intent(MainActivity.this, ActionVIew.class);
-//            startActivity(intent);
-//        }));
-        try {
-            Log.e("__SpotifyAppRemote", Boolean.toString(_SpotifyAppRemote.isConnected()));
-        }catch(Exception e){
-            Log.e("GETING CONNECTION", e.getMessage());
-        }
-//        subscribeToPlayerStateUpdates();
+        ConnectToRemote();
 
         alreadyPlayingBox.setOnClickListener((view -> {
             Intent intent = new Intent(MainActivity.this, PlayTrackActivity.class);
             startActivity(intent);
         }));
 
-
-        Load();
     }
 
 
     public void ConnectToRemote(){
-        SpotifyAppRemoteConnector.Connect(MainActivity.this);
-        _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
+            SpotifyAppRemoteConnector.Connect(MainActivity.this);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
+                    if (_SpotifyAppRemote != null) {
+                        Load();
+                    }
+                }
+            }, 3000);
+
     }
 
     private void Load(){
-        if (_SpotifyAppRemote != null) {
-            Log.e("__SpotifyAppRemote", Boolean.toString(_SpotifyAppRemote.isConnected()));
-
-            _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->{
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        alreadyPlayingName.setText(playerState.track.name);
-                    }
-                });
-            }));
-        }
+            if (_SpotifyAppRemote !=null) {
+                _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            alreadyPlayingName.setText(playerState.track.name);
+                            _SpotifyAppRemote
+                                    .getImagesApi()
+                                    .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
+                                    .setResultCallback(
+                                            bitmap -> {
+                                                alreadyPlayingImg.setImageBitmap(bitmap);
+                                            });
+                        }
+                    });
+                }));
+            }
     }
-
-    private int _numRetries = 0;
-    private final int MAX_RETRIES = 3;
-
-    private void subscribeToPlayerStateUpdates() {
-        Log.e("GETING CONNECTION", "NO CIE DZIJEES");
-
-        if (_numRetries >= MAX_RETRIES) {
-            // Maximum number of retries exceeded, show error message or take other action
-            return;
-        }
-
-        if (_SpotifyAppRemote == null) {
-            // Wait for a short delay before retrying
-            new Handler().postDelayed(() -> subscribeToPlayerStateUpdates(), 1000);
-            _numRetries++;
-            return;
-        }
-
-        _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->{
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alreadyPlayingName.setText(playerState.track.name);
-                }
-            });
-        }));
-    }
-
 
 
 //    @Override

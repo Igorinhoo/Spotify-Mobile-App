@@ -9,39 +9,5 @@
     android:gravity="center"
     android:id="@+id/fragmentFirstContainer">
 
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/Kanye"-->
-<!--            android:text="Kanye"-->
-
-<!--            />-->
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/Kendrick"-->
-<!--            android:text="Kendrick"-->
-<!--            />-->
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/Jay_Z"-->
-<!--            android:text="Jay_Z"-->
-
-<!--            />-->
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/Travis"-->
-<!--            android:text="Travis"-->
-
-<!--            />-->
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/Nas"-->
-<!--            android:text="Nas"-->
-
-<!--            />-->
 
 </LinearLayout>

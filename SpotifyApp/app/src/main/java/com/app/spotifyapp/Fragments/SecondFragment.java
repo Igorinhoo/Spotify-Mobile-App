@@ -71,11 +71,11 @@ public class SecondFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e("SECOND FRAGMENT", "CZY DZIALA");
 
         Bundle bundle = getArguments();
         if (bundle != null) {
             data = bundle.getString("artistUri");
+            _binding.tv.setText(bundle.getString("artistName"));
         }
 
         _binding.tv.setOnClickListener(new View.OnClickListener() {

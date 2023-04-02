@@ -12,14 +12,12 @@
         android:id="@+id/tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment" />
-
-    <TextView
-        android:id="@+id/text_view"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/white"
+        android:textSize="30sp"
         android:textStyle="bold"
-        android:textSize="40sp"/>
+        android:textAlignment="center"/>
 
     <Button
         android:id="@+id/toSingles"

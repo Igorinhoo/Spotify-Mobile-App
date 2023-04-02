@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_first.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_second.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/xml/shaper.xml" value="0.291970802919708" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/SpotifyApp/app/src/main/res/drawable/bg_launcher.xml" value="0.119" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/SpotifyApp/app/src/main/res/drawable/btn_next.xml" value="0.1" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/SpotifyApp/app/src/main/res/drawable/btn_pause.xml" value="0.22" />

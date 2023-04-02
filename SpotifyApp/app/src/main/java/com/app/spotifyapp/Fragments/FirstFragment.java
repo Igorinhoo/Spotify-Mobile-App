@@ -47,8 +47,8 @@ public class FirstFragment extends Fragment {
                         "0eDvMgVFoNV3TpwtrVCoTj", "2pAWfrd7WFF3XhVt9GooDL",
                         "13ubrt8QOOCPljQ2FL1Kca", "1Xyo4u8uXC1ZmMpatF05PJ",
                         "4V8LLVI7PbaPR0K2TGSxFF"));
-        List<String> buttons = Arrays.asList("Kanye", "Kendrick", "Jay-Z",
-                "Travis", "Nas", "Drake", "Pop Smoke", "MF DOOM", "A$AP ROCKY", "The Weeknd", "Tyler, The Creator");
+        List<String> buttons = Arrays.asList("Kanye West", "Kendrick Lamar", "Jay-Z",
+                "Travis Scott", "Nas", "Drake", "Pop Smoke", "MF DOOM", "A$AP ROCKY", "The Weeknd", "Tyler, The Creator");
 
         AddViewButtons(buttons);
         for (int i = 0; i < buttons.size(); i++) {
@@ -59,6 +59,7 @@ public class FirstFragment extends Fragment {
                 public void onClick(View view) {
                     Bundle bundle = new Bundle();
                     bundle.putString("artistUri", artists.get(finalI));
+                    bundle.putString("artistName", buttons.get(finalI));
                     Navigation.findNavController(view).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
                 }
             });
