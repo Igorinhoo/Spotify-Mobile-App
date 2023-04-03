@@ -3,36 +3,25 @@ package com.app.spotifyapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.app.spotifyapp.Fragments.FirstFragment;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.Artist;
 import com.spotify.protocol.types.Image;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Delayed;
-
-import kotlinx.coroutines.Delay;
+import java.util.StringJoiner;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView alreadyPlayingName;
+    private TextView alreadyPlayingName, alreadyPlayingArtists;
     private ImageView alreadyPlayingImg;
     private LinearLayout alreadyPlayingBox;
     private SpotifyAppRemote _SpotifyAppRemote;
@@ -50,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         alreadyPlayingBox = findViewById(R.id.alreadyPlayingBox);
         alreadyPlayingName = findViewById(R.id.alreadyPlayingName);
+        alreadyPlayingArtists = findViewById(R.id.alreadyPlayingArtists);
         alreadyPlayingImg = findViewById(R.id.alreadyPlayingImg);
 
         ConnectToRemote();
@@ -82,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            StringJoiner names = new StringJoiner(", ");
+                            for (Artist artist : playerState.track.artists) {
+                                names.add(artist.name);
+                            }
+                            alreadyPlayingArtists.setText(names.toString());
                             alreadyPlayingName.setText(playerState.track.name);
                             _SpotifyAppRemote
                                     .getImagesApi()

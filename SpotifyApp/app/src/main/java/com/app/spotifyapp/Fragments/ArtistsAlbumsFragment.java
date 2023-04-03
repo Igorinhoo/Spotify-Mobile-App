@@ -20,14 +20,14 @@ import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
-import com.app.spotifyapp.databinding.FragmentSecondBinding;
+import com.app.spotifyapp.databinding.FragmentArtistsAlbumsBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.ErrorCallback;
 
 import java.util.ArrayList;
 
 
-public class SecondFragment extends Fragment {
+public class ArtistsAlbumsFragment extends Fragment {
 
     private String data;
     private final ErrorCallback mErrorCallback = this::logError;
@@ -41,7 +41,7 @@ public class SecondFragment extends Fragment {
     }
 
 
-    private FragmentSecondBinding _binding;
+    private FragmentArtistsAlbumsBinding _binding;
 
     @Override
     public void onStart() {
@@ -51,7 +51,7 @@ public class SecondFragment extends Fragment {
             SpotifyAppRemoteConnector.Connect(getActivity());
             connected();
         }catch (Exception e){
-            Log.d("Main Activity", "Nie polaczone");
+            Log.d("Second Fragment ", "Nie polaczone");
         }
     }
 
@@ -64,7 +64,7 @@ public class SecondFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        _binding = FragmentSecondBinding.inflate(inflater, container, false);
+        _binding = FragmentArtistsAlbumsBinding.inflate(inflater, container, false);
         return _binding.getRoot();
     }
 
@@ -78,13 +78,8 @@ public class SecondFragment extends Fragment {
             _binding.tv.setText(bundle.getString("artistName"));
         }
 
-        _binding.tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Navigation.findNavController(view).navigate(R.id.action_SecondFragment_to_FirstFragment);
-
-            }
-        });
+        _binding.tv.setOnClickListener(view1 ->
+                Navigation.findNavController(view1).navigate(R.id.action_SecondFragment_to_FirstFragment));
     }
 
 

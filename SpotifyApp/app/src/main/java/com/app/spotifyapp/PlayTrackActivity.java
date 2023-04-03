@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -23,17 +24,20 @@ import com.app.spotifyapp.Interfaces.TrackDataCallback;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
+import com.app.spotifyapp.databinding.ActivityPlayTrackBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.spotify.android.appremote.api.ImagesApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.CallResult;
+import com.spotify.protocol.types.Artist;
 import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.ImageUri;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -41,10 +45,7 @@ import java.util.concurrent.Future;
 public class PlayTrackActivity extends AppCompatActivity {
 
     private SpotifyAppRemote _SpotifyAppRemote;
-    private ImageButton play, skipToNext, skipToPrevious;
-    private ImageView trackImage;
-    private TextView playTrackName;
-    private boolean playing = true;
+    private ActivityPlayTrackBinding _binding;
 
     TrackProgressBar mTrackProgressBar;
     SeekBar mSeekBar;
@@ -53,14 +54,12 @@ public class PlayTrackActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play_track);
-        play = findViewById(R.id.playTrack);
-        skipToPrevious = findViewById(R.id.skipPrevious);
-        skipToNext = findViewById(R.id.skipNext);
-        playTrackName = findViewById(R.id.playTrackName);
-        trackImage = findViewById(R.id.trackImage);
+        _binding = ActivityPlayTrackBinding.inflate(getLayoutInflater());
+        View view = _binding.getRoot();
+        setContentView(view);
 
-        play.setImageResource(R.drawable.btn_pause);
+
+        _binding.playTrack.setImageResource(R.drawable.btn_pause);
 
         Intent intent = getIntent();
 //        String href = intent.getStringExtra("TrackHref");
@@ -73,23 +72,21 @@ public class PlayTrackActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    playTrackName.setText(playerState.track.name);
-//                                    Log.d("CO SIE DZIEJE", playerState.track.imageUri.toString());
-//
+                    StringJoiner names = new StringJoiner(", ");
+                    _binding.playTrackName.setText(playerState.track.name);
+                    for (Artist artist : playerState.track.artists) {
+                        names.add(artist.name);
+                    }
+                    _binding.playTrackArtists.setText(names.toString());
+//                    playerState.track.duration
+
                     _SpotifyAppRemote
                             .getImagesApi()
                             .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
                             .setResultCallback(
                                     bitmap -> {
-                                        trackImage.setImageBitmap(bitmap);
-//                                        mImageLabel.setText(
-//                                                String.format(
-//                                                        Locale.ENGLISH, "%d x %d", bitmap.getWidth(), bitmap.getHeight()));
+                                        _binding.trackImage.setImageBitmap(bitmap);
                                     });
-
-
-//                    Picasso.get().load(String.valueOf(_SpotifyAppRemote.getImagesApi().getImage(playerState.track.imageUri))).into(trackImage);
-
                 }
             });
         }));
@@ -102,7 +99,7 @@ public class PlayTrackActivity extends AppCompatActivity {
 //                runOnUiThread(new Runnable() {
 //                    @Override
 //                    public void run() {
-////                        Log.d("CO SIE DZIEJE", trackDatas.toString());
+////
 ////                        playTrackName.setText(trackDatas.Name);
 //                        Picasso.get().load(trackDatas.Img).into(trackImage);
 //
@@ -135,27 +132,29 @@ public class PlayTrackActivity extends AppCompatActivity {
 
 
 
-        play.setOnClickListener((view -> {
-            Playing();
-        }));
+        _binding.playTrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Playing();
+            }
+        });
 
 
 
-        skipToPrevious.setOnClickListener((view ->{
-            _SpotifyAppRemote.getPlayerApi().skipPrevious();
-        }));
-        skipToNext.setOnClickListener((view ->{
-            _SpotifyAppRemote.getPlayerApi().skipNext();
-        }));
 
+        _binding.skipPrevious.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                _SpotifyAppRemote.getPlayerApi().skipPrevious();
+            }
+        });
+        _binding.skipNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                _SpotifyAppRemote.getPlayerApi().skipNext();
+            }
+        });
 
-//        trackImage.setOnClickListener((view -> {
-//            _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(playerState->{
-//
-//                new AlertDialog.Builder(this).setTitle("Title").setMessage(new GsonBuilder().setPrettyPrinting().create().toJson(playerState)).create().show();
-//            });
-//
-//        }));
     }
 
     private void Playing(){
@@ -165,19 +164,19 @@ public class PlayTrackActivity extends AppCompatActivity {
                 .setResultCallback(
                         playerState -> {
                             if (playerState.isPaused) {
-                                play.setImageResource(R.drawable.btn_pause);
+                                _binding.playTrack.setImageResource(R.drawable.btn_pause);
                                 _SpotifyAppRemote
                                         .getPlayerApi()
-                                        .resume()
-                                        .setResultCallback(
-                                                empty -> Toast.makeText(this, "TOAST MAKED", Toast.LENGTH_SHORT).show());
+                                        .resume();
+//                                        .setResultCallback(
+//                                                empty -> Toast.makeText(this, "TOAST MAKED", Toast.LENGTH_SHORT).show());
                             } else {
-                                play.setImageResource(R.drawable.btn_play);
+                                _binding.playTrack.setImageResource(R.drawable.btn_play);
                                 _SpotifyAppRemote
                                         .getPlayerApi()
-                                        .pause()
-                                        .setResultCallback(
-                                                empty -> Toast.makeText(this, "TOAST MAKED", Toast.LENGTH_SHORT).show());
+                                        .pause();
+//                                        .setResultCallback(
+//                                                empty -> Toast.makeText(this, "TOAST MAKED", Toast.LENGTH_SHORT).show());
                             }
                         });
     }
