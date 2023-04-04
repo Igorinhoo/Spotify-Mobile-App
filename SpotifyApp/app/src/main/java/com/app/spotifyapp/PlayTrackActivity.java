@@ -35,12 +35,15 @@ import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.ImageUri;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class PlayTrackActivity extends AppCompatActivity {
 
@@ -49,6 +52,7 @@ public class PlayTrackActivity extends AppCompatActivity {
 
     TrackProgressBar mTrackProgressBar;
     SeekBar mSeekBar;
+    TextView durationStart;
 
 
     @Override
@@ -62,7 +66,6 @@ public class PlayTrackActivity extends AppCompatActivity {
         _binding.playTrack.setImageResource(R.drawable.btn_pause);
 
         Intent intent = getIntent();
-//        String href = intent.getStringExtra("TrackHref");
 
         SpotifyAppRemoteConnector.Connect(PlayTrackActivity.this);
         _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
@@ -78,7 +81,7 @@ public class PlayTrackActivity extends AppCompatActivity {
                         names.add(artist.name);
                     }
                     _binding.playTrackArtists.setText(names.toString());
-//                    playerState.track.duration
+                    _binding.durationEnd.setText(timeToDuration(playerState.track.duration));
 
                     _SpotifyAppRemote
                             .getImagesApi()
@@ -109,9 +112,7 @@ public class PlayTrackActivity extends AppCompatActivity {
 //
 //        });
 
-
-
-
+        durationStart = findViewById(R.id.durationStart);
         mSeekBar = findViewById(R.id.seek_to_bar);
         mSeekBar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         mSeekBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
@@ -181,6 +182,14 @@ public class PlayTrackActivity extends AppCompatActivity {
                         });
     }
 
+    public String timeToDuration(Long time){
+        long min = TimeUnit.MILLISECONDS.toMinutes(time);
+        long sec = TimeUnit.MILLISECONDS.toSeconds(time) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
+
+        String result = min + ":" + (sec < 10 ? "0" + sec : sec);
+        return result;
+    }
 
 
 
@@ -190,10 +199,16 @@ public class PlayTrackActivity extends AppCompatActivity {
         private final SeekBar mSeekBar;
         private final Handler mHandler;
 
+
         public final SeekBar.OnSeekBarChangeListener mSeekBarChangeListener =
                 new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int totalSeconds = progress / 1000; // convert progress to seconds
+                        int minutes = totalSeconds / 60;
+                        int seconds = totalSeconds % 60;
+                        String time = String.format("%02d:%02d", minutes, seconds); // format time as mm:ss
+                        durationStart.setText(time);
                     }
 
                     @Override
@@ -206,6 +221,7 @@ public class PlayTrackActivity extends AppCompatActivity {
                         _SpotifyAppRemote
                                 .getPlayerApi()
                                 .seekTo(seekBar.getProgress());
+
                     }
                 };
 
