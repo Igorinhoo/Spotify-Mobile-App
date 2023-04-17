@@ -10,7 +10,7 @@ Korzysta z:
 </h2>
 
 
-<div align="center">
+<div>
 
 <div>
 <h3>
@@ -22,7 +22,7 @@ Na dole zdjecia wyświetlana jest bieżąco odtwarzana piosenka, po naciśnięci
 </div>
   
 <div>
-<h3>Ta strona wyświetla wszystkie albumy artysty, którego wybraliśmy z listy dostępnych artystów. Widoczny jest przycisk GET SINGLES, który przenosi nas do strony widocznej na zdjęciu 3. Po naciśnięciu jednego z albumów przenosimy sie do listy piosenek tego albumu, widocznego na zdjęciu 4.Na dole zdjecia również wyświetlana jest bieżąco odtwarzana piosenka, po naciśnięciu której przenosimy się do strony widocznej na zdjęciu 5</h3>
+<h3>Ta strona wyświetla wszystkie albumy artysty, którego wybraliśmy z listy dostępnych artystów. Widoczny jest przycisk GET SINGLES, który przenosi nas do strony widocznej na zdjęciu 3. Po naciśnięciu jednego z albumów przenosimy sie do listy piosenek tego albumu, widocznego na zdjęciu 4. Na dole zdjecia również wyświetlana jest bieżąco odtwarzana piosenka, po naciśnięciu której przenosimy się do strony widocznej na zdjęciu 5</h3>
 <img src="https://github.com/Igorinhoo/Spotify-Mobile-App/blob/main/zdj/2.jpg" style="height: 600px"/>
 </div>
   
