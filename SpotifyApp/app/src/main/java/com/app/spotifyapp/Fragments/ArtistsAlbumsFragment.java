@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.app.spotifyapp.Adapters.AlbumsRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.AlbumDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
 import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;

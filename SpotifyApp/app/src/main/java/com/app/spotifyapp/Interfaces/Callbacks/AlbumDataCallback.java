@@ -1,4 +1,4 @@
-package com.app.spotifyapp.Interfaces;
+package com.app.spotifyapp.Interfaces.Callbacks;
 
 import com.app.spotifyapp.Models.AlbumDAO;
 

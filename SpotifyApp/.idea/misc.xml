@@ -3,15 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/activity_play_track.xml" value="0.1953125" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/albumlistview.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/app_remote_layout.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_albums_track_list.xml" value="0.1953125" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_artists.xml" value="0.1953125" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_artists_albums.xml" value="0.1953125" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_first.xml" value="0.25" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_second.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/fragment_statistics.xml" value="0.25" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/girdmodel.xml" value="0.14114583333333333" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/gridmodel.xml" value="0.176" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/layout/tracklistview.xml" value="0.25" />
+        <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/menu/bottom_app_menu.xml" value="0.25" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/Spotify-Mobile-App/SpotifyApp/app/src/main/res/xml/shaper.xml" value="0.291970802919708" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/SpotifyApp/app/src/main/res/drawable/bg_launcher.xml" value="0.119" />
         <entry key="..\:/Users/Igor/AndroidStudioProjects/SpotifyApp/app/src/main/res/drawable/btn_next.xml" value="0.1" />

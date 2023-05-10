@@ -16,7 +16,7 @@ public abstract class StringCallback implements Callback {
         try {
             JSONObject json = new JSONObject(responseJson);
             String accessToken = json.getString("access_token");
-            onResponse(accessToken); // Pass accessToken as a String parameter
+            onResponse(accessToken);
         } catch (JSONException e) {
             onFailure(e);
         }

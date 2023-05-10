@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
 import com.app.spotifyapp.Interfaces.OnTrackClickListener;
-import com.app.spotifyapp.Interfaces.TrackDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
@@ -60,7 +60,7 @@ public class AlbumsTrackList extends Fragment {
     }
 
     public void ConnectToRemote(){
-        SpotifyAppRemoteConnector.Connect(getActivity());
+//        SpotifyAppRemoteConnector.Connect(getActivity());
         _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
     }
 
