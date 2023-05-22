@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 
-
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -32,6 +34,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.types.Artist;
 import com.spotify.protocol.types.Image;
+import com.spotify.sdk.android.auth.AuthorizationClient;
+import com.spotify.sdk.android.auth.AuthorizationRequest;
+import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 import java.util.StringJoiner;
 
@@ -50,11 +55,41 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private BottomNavigationView bottomNavigationView;
 
+    private ActivityResultLauncher<Intent> launcher;
+    private static String accessToken;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AuthorizationRequest.Builder builder =
+                new AuthorizationRequest.Builder("8595ceb3423c45aca5775efb610b48b7", AuthorizationResponse.Type.TOKEN, "com.app.SpotifyApp://callback");
+
+        builder.setScopes(new String[]{"user-top-read"});
+        AuthorizationRequest request = builder.build();
+
+        Intent intent = AuthorizationClient.createLoginActivityIntent(this, request);
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                AuthorizationResponse response = AuthorizationClient.getResponse(result.getResultCode(), result.getData());
+
+                switch (response.getType()) {
+                    case TOKEN:
+                        accessToken = response.getAccessToken();
+                        Log.e("TOKEN", accessToken );
+                        break;
+                    case ERROR:
+                        Log.e("Error", "DFJAFN" );
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        launcher.launch(intent);
+
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
         navController = navHostFragment.getNavController();
@@ -69,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
         alreadyPlayingImg = findViewById(R.id.alreadyPlayingImg);
 
         ConnectToRemote();
-
-
     }
 
     @Override
@@ -79,8 +112,6 @@ public class MainActivity extends AppCompatActivity {
         Log.e("ONSTART", "MAIN");
 
         Load();
-
-
 
 
         alreadyPlayingBox.setOnClickListener((view -> {
@@ -119,6 +150,10 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
 
+    public static String getAccessToken(){
+        if (accessToken != null) return accessToken;
+        throw new NullPointerException();
+    }
 
     @Override
     protected void onRestart() {

@@ -12,6 +12,7 @@ import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
+import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.Services.AccessToken;
 import com.spotify.protocol.types.Artist;
 
@@ -37,7 +38,6 @@ public class ApiDataProvider {
     private final ArrayList<AlbumDAO> albums = new ArrayList<>();
     private final ArrayList<ArtistDAO> artists = new ArrayList<>();
     private final ArrayList<TrackDAO> tracks = new ArrayList<>();
-    private final ArrayList<ArtistDAO> topArtists = new ArrayList<>();
 
 
     public final void getArtistsAlbums(String data, String scope, AlbumDataCallback albumCallback) {
@@ -132,7 +132,7 @@ public class ApiDataProvider {
                                 name = album.getString("name");
                                 uri = album.getString("href").substring(34);
                                 duration = album.getLong("duration_ms");
-                                TrackDAO track = new TrackDAO(name, uri, duration, albumImg);
+                                TrackDAO track = new TrackDAO(name, uri, duration, albumImg, null);
                                 tracks.add(track);
                             }
                             trackCallback.onTrackDataReceived(tracks);
@@ -189,8 +189,8 @@ public class ApiDataProvider {
                                     name = artist.getString("name");
                                     Img = artist.getJSONArray("images").getJSONObject(0).getString("url");
                                     uri = artist.getString("id");
-                                    ArtistDAO track = new ArtistDAO(name, Img, uri);
-                                    artists.add(track);
+                                    ArtistDAO arti = new ArtistDAO(name, Img, uri);
+                                    artists.add(arti);
 
                                 }
                                 artistsCallback.onArtistsDataReceived(artists);
@@ -224,76 +224,7 @@ public class ApiDataProvider {
     }
 
 
-    public final void getTopArtists(TopArtistsCallback topArtistsCallback) {
-        AccessToken.getInstance().getAccessToken(new StringCallback() {
-            @Override
-            public void onResponse(String accessToken) {
-                Request request = new Request.Builder()
-                        .url("https://api.spotify.com/v1/me/top/artists?limit=50")
-                        .header("Authorization", "Bearer " + accessToken)
-                        .build();
 
-                Log.e("ACESS", accessToken );
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
-                            return;
-                        }
-                        try {
-
-                            String name = "";
-                            String uri = "";
-                            String Img = "";
-                            JSONObject json = new JSONObject(response.body().string());
-                            Log.e("JSON TOP ARTS", json.toString() );
-                            try {
-
-                                JSONArray items = json.getJSONArray("items");
-
-                                for (int i = 0; i < items.length(); i++) {
-                                    JSONObject artist = items.getJSONObject(i);
-                                    name = artist.getString("name");
-                                    uri = artist.getString("id");
-                                    Img = artist.getJSONArray("images").getJSONObject(0).getString("url");
-
-//                                    System.out.println(name);
-                                    ArtistDAO track = new ArtistDAO(name, Img, uri);
-                                    topArtists.add(track);
-                                }
-
-
-                                topArtistsCallback.onTopArtistsDataReceived(topArtists);
-                            } catch (Exception e) {
-                                Log.e("Exception", e.getMessage());
-
-                            }
-
-                        } catch (Exception e) {
-                            Log.e("Call Top Artists", e.getMessage());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        });
-
-
-    }
 }
 
 

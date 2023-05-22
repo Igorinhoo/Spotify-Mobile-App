@@ -28,9 +28,22 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+
+    sourceSets{
+        main {
+            res.srcDirs = [
+                    'src\\main\\res', 'src\\main\\res\\layout\\listviews'
+            ]
+        }
+    }
+    namespace 'com.app.spotifyapp'
 }
 
 dependencies {
+    implementation 'androidx.activity:activity-ktx:1.4.0'
+    implementation 'androidx.fragment:fragment-ktx:1.4.0'
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.spotify.android:auth:1.2.5'

@@ -1,16 +1,15 @@
 package com.app.spotifyapp.Fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridView;
 
 import com.app.spotifyapp.Adapters.ArtistsGridViewAdapter;
 import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
@@ -23,6 +22,7 @@ import com.app.spotifyapp.databinding.FragmentArtistsBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ArtistsFragment extends Fragment {
 
@@ -49,14 +49,14 @@ public class ArtistsFragment extends Fragment {
 
         ArrayList<ArtistDAO> finalArtistsData = artistsDatas[0];
 
-        ArtistsGridViewAdapter adapter = new ArtistsGridViewAdapter(getActivity(), finalArtistsData);
+        ArtistsGridViewAdapter adapter = new ArtistsGridViewAdapter(requireActivity(), finalArtistsData);
         adapter.setOnArtistClickListener(new OnArtistClickListener() {
             @Override
             public void onItemClick(ArtistDAO artist) {
                 Bundle bundle = new Bundle();
                 bundle.putString("artistUri", artist.Uri);
                 bundle.putString("artistName", artist.Name);
-                Navigation.findNavController(getView()).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
+                Navigation.findNavController(requireView()).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
             }
         });
 
@@ -83,7 +83,7 @@ public class ArtistsFragment extends Fragment {
         api.getArtists(ids, new ArtistDataCallback() {
             @Override
             public void onArtistsDataReceived(ArrayList<ArtistDAO> artistsData) {
-                getActivity().runOnUiThread(new Runnable() {
+                requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         artistsDatas[0].clear();

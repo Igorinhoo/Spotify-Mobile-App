@@ -10,6 +10,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public abstract class StringCallback implements Callback {
+
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         String responseJson = response.body().string();
