@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnAlbumClickListener;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -46,18 +46,14 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
 
     @Override
     public void onBindViewHolder(@NonNull AlbumsRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_listener != null) {
-                    _listener.onItemClick(position);
-                }
+        holder.itemView.setOnClickListener(view -> {
+            if (_listener != null) {
+                _listener.onItemClick(position);
             }
         });
 
-        holder.name.setText(data.get(position).AlbumName);
-        Picasso.get().load(data.get(position).AlbumImg).into(holder.image);
-//        data.get(position).getThird()
+        holder.name.setText(data.get(position).Name);
+        Picasso.get().load(data.get(position).Img).into(holder.image);
     }
     @Override
     public int getItemCount() {
@@ -85,6 +81,9 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         public void onClick(View view) {
             _listener.onItemClick(getAdapterPosition());
         }
+        
+
+
     }
 
 }

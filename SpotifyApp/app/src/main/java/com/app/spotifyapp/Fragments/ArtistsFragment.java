@@ -13,7 +13,7 @@ import androidx.navigation.Navigation;
 
 import com.app.spotifyapp.Adapters.ArtistsGridViewAdapter;
 import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
-import com.app.spotifyapp.Interfaces.OnArtistClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
@@ -22,7 +22,6 @@ import com.app.spotifyapp.databinding.FragmentArtistsBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class ArtistsFragment extends Fragment {
 

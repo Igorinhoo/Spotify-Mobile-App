@@ -11,11 +11,27 @@
         android:label="fragment_statistics"
         tools:layout="@layout/fragment_statistics" />
 
+    <fragment
+        android:id="@+id/playlists"
+        android:name="com.app.spotifyapp.Fragments.PlaylistsFragment"
+        android:label="fragment_playlists"
+        tools:layout="@layout/fragment_playlists" >
+        <action
+            android:id="@+id/action_playlists_to_playlistTrackListFragment"
+            app:destination="@+id/playlistTrackListFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistTrackListFragment"
+        android:name="com.app.spotifyapp.Fragments.PlaylistTrackListFragment"
+        android:label="fragment_playlist_track_list"
+        tools:layout="@layout/fragment_playlist_track_list" />
+
     <navigation android:id="@+id/music_navigation"
         app:startDestination="@id/ArtistsFragment">
         <fragment
             android:id="@+id/albumsTrackList"
-            android:name="com.app.spotifyapp.Fragments.AlbumsTrackList"
+            android:name="com.app.spotifyapp.Fragments.AlbumsTrackListFragment"
             android:label="AlbumsTrackList">
             <action
                 android:id="@+id/action_albumsTrackList_to_SecondFragment"
@@ -45,5 +61,7 @@
                 app:destination="@id/ArtistsAlbumsFragment" />
         </fragment>
     </navigation>
+
+
 
 </navigation>

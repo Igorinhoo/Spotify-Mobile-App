@@ -112,15 +112,22 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_weight="0.3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             >
 
-           <TextView
-               android:id="@+id/songLyrics"
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               />
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+                <TextView
+                    android:id="@+id/songLyrics"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+            </ScrollView>
+
         </LinearLayout>
     </LinearLayout>
 

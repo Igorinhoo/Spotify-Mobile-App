@@ -1,4 +1,4 @@
-package com.app.spotifyapp.Interfaces;
+package com.app.spotifyapp.Interfaces.Listeners;
 
 public interface OnTopArtistClickListener {
     void onItemClick(int position);

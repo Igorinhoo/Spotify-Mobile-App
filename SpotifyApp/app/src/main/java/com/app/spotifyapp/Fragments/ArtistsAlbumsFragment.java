@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.app.spotifyapp.Adapters.AlbumsRecyclerViewAdapter;
 import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
-import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnAlbumClickListener;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
@@ -90,9 +90,9 @@ public class ArtistsAlbumsFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
                 Bundle bundle = new Bundle();
-                bundle.putString("selectedAlbum", finalAlbumData.get(position).AlbumName);
+                bundle.putString("selectedAlbum", finalAlbumData.get(position).Name);
                 bundle.putString("albumHref", finalAlbumData.get(position).Uri);
-                bundle.putString("albumImg", finalAlbumData.get(position).AlbumImg);
+                bundle.putString("albumImg", finalAlbumData.get(position).Img);
 
                 Navigation.findNavController(getView()).navigate(R.id.action_SecondFragment_to_albumsTrackList, bundle);
             }

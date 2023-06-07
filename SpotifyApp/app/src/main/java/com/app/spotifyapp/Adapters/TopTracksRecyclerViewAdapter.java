@@ -10,8 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.OnTopArtistClickListener;
-import com.app.spotifyapp.Interfaces.OnTopTrackClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnTopTrackClickListener;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;

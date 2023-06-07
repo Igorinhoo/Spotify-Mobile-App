@@ -1,54 +1,34 @@
 package com.app.spotifyapp.Fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.app.spotifyapp.Adapters.TopArtistsRecyclerViewAdapter;
 import com.app.spotifyapp.Adapters.TopTracksRecyclerViewAdapter;
-import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.Callbacks.AuthorizationCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TopArtistsCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TopTracksCallback;
-import com.app.spotifyapp.Interfaces.OnArtistClickListener;
-import com.app.spotifyapp.Interfaces.OnTopArtistClickListener;
-import com.app.spotifyapp.Interfaces.OnTopTrackClickListener;
-import com.app.spotifyapp.Interfaces.OnTrackClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnTopArtistClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnTopTrackClickListener;
 import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
-import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
-import com.app.spotifyapp.R;
-import com.app.spotifyapp.Repositories.ApiDataProvider;
 import com.app.spotifyapp.Repositories.StatisticsAPIDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentStatisticsBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationRequest;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class StatisticsFragment extends Fragment{
@@ -102,14 +82,15 @@ public class StatisticsFragment extends Fragment{
                              Bundle savedInstanceState) {
         _binding = FragmentStatisticsBinding.inflate(inflater, container, false);
 
-
-
         return _binding.getRoot();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        api.getQUEUE(MainActivity.getAccessToken());
+
 
         _binding.tracks.setOnClickListener((view -> {
             _binding.topItemsRecycler.setLayoutParams(weigth0);
@@ -141,6 +122,7 @@ public class StatisticsFragment extends Fragment{
                 @Override
                 public void onItemClick(int position) {
                     Log.e("onItemClick: ", ArtistData.get(position).Name);
+                    Toast.makeText(requireContext(), ArtistData.get(position).Name, Toast.LENGTH_SHORT).show();
                 }
             });
             _binding.topItemsRecycler.setAdapter(adapter);
@@ -152,5 +134,9 @@ public class StatisticsFragment extends Fragment{
 
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        _binding = null;
+    }
 }

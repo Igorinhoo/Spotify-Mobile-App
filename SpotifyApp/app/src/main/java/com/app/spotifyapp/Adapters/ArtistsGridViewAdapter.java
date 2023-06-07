@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.app.spotifyapp.Interfaces.OnArtistClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;

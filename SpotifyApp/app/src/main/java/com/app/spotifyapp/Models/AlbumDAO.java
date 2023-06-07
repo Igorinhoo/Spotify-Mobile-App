@@ -1,16 +1,14 @@
 package com.app.spotifyapp.Models;
 
-import java.util.ArrayList;
-
 public class AlbumDAO {
-    public String AlbumName;
+    public String Name;
     public String Uri;
-    public String AlbumImg;
+    public String Img;
 
-    public AlbumDAO(String AlbumName, String Uri, String AlbumImg){
-        this.AlbumName = AlbumName;
+    public AlbumDAO(String Name, String Uri, String Img){
+        this.Name = Name;
         this.Uri = Uri;
-        this.AlbumImg = AlbumImg;
+        this.Img = Img;
     }
 //
 //    public ArrayList<TrackDAO> albumToTrack(ArrayList<AlbumDAO> albums){

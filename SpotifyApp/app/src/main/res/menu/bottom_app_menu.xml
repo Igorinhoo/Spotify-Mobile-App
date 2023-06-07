@@ -10,6 +10,8 @@
         android:title="Statistics"/>
     <item
         android:id="@+id/playlists"
-        android:title="Playlists"/>
+        android:icon="@drawable/playlist"
+        android:title="Playlists"
+        />
 
 </menu>

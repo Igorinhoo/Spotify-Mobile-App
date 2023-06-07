@@ -8,23 +8,27 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.OnTrackClickListener;
 import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
+import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
+import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
+import com.app.spotifyapp.Repositories.PlaylistsAPIProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentAlbumsTrackListBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import java.util.ArrayList;
 
-public class AlbumsTrackList extends Fragment {
+public class AlbumsTrackListFragment extends Fragment {
 
     private final ArrayList<String> hrefs = new ArrayList<>() ;
     private final ArrayList<String> duration = new ArrayList<>();
@@ -71,38 +75,43 @@ public class AlbumsTrackList extends Fragment {
 
         TracksRecyclerViewAdapter adapter = new TracksRecyclerViewAdapter(getActivity(), finalTrackData, new OnTrackClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(TrackDAO track) {
                 if (_SpotifyAppRemote != null) {
-                    _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + hrefs.get(position));
+                    _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Uri);
                     Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                    intent.putExtra("TrackHref", hrefs.get(position));
+                    intent.putExtra("TrackHref", track.Uri);
                     startActivity(intent);
                 }
             }
-        });
+
+            @Override
+            public void onLongClick(TrackDAO track) {
+                PlaylistsAPIProvider api = new PlaylistsAPIProvider(MainActivity.getAccessToken());
+                try {
+                    api.AddToPlaylist(MainActivity.getAccessToken(), "7hnrA0Ngd2yNhRdHSWYklL", new String[]{"spotify:track:" + track.Uri});
+                    Toast.makeText(requireContext(), "Dodano " + track.Name , Toast.LENGTH_SHORT).show();
+                    Log.e("onLongClick: ", track.Name);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Nie Dodano", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        );
         _binding.trackListRecycler.setAdapter(adapter);
 
         ApiDataProvider api = new ApiDataProvider();
-        finalHref = "https://api.spotify.com/v1/albums/" + href +"/tracks?market=GB&limit=40";
+        finalHref = "https://api.spotify.com/v1/albums/" + href + "/tracks?market=GB&limit=40";
 
         api.getAlbumTracks(finalHref, img, new TrackDataCallback() {
             @Override
             public void onTrackDataReceived(ArrayList<TrackDAO> trackDatas) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        trackData[0].clear();
-                        trackData[0].addAll(trackDatas);
-                        adapter.UpdateData(trackData[0]);
+                requireActivity().runOnUiThread(() -> {
+                    trackData[0].clear();
+                    trackData[0].addAll(trackDatas);
+                    adapter.UpdateData(trackData[0]);
 
-
-                        for (TrackDAO item : trackDatas
-                        ) {
-                            hrefs.add(item.Uri);
-                        }
-
-                        adapter.notifyDataSetChanged();
-                    }
+                    adapter.notifyDataSetChanged();
                 });
             }
 

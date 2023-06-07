@@ -29,6 +29,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 
+import com.app.spotifyapp.Repositories.PlaylistsAPIProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
@@ -38,8 +39,13 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.StringJoiner;
 
+import kotlin.Pair;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -53,11 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private SpotifyAppRemote _SpotifyAppRemote;
 
     private NavController navController;
-    private BottomNavigationView bottomNavigationView;
 
     private ActivityResultLauncher<Intent> launcher;
     private static String accessToken;
-
+    public static String UserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder("8595ceb3423c45aca5775efb610b48b7", AuthorizationResponse.Type.TOKEN, "com.app.SpotifyApp://callback");
 
-        builder.setScopes(new String[]{"user-top-read"});
+        builder.setScopes(new String[]{"user-top-read", "user-read-playback-state", "user-read-email",
+                "user-read-private", "playlist-read-private", "playlist-read-collaborative",
+                "playlist-modify-private", "playlist-modify-public"});
         AuthorizationRequest request = builder.build();
 
         Intent intent = AuthorizationClient.createLoginActivityIntent(this, request);
@@ -94,9 +101,8 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
         navController = navHostFragment.getNavController();
 
-        bottomNavigationView = findViewById(R.id.bottomNav);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNav);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
 
         alreadyPlayingBox = findViewById(R.id.alreadyPlayingBox);
         alreadyPlayingName = findViewById(R.id.alreadyPlayingName);
@@ -113,42 +119,20 @@ public class MainActivity extends AppCompatActivity {
 
         Load();
 
+        JSONObject playlistData = new JSONObject();
+        try {
+            playlistData.put("tracks", new String[]{"raz", "dwa", "trzy"});
+            playlistData.put("snapshot_id", "Dont know");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.e( "onStart: ", playlistData.toString());
 
         alreadyPlayingBox.setOnClickListener((view -> {
             Intent intent = new Intent(MainActivity.this, PlayTrackActivity.class);
             startActivity(intent);
         }));
     }
-
-
-//    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-//        super.onActivityResult(requestCode, resultCode, intent);
-//
-//        // Check if result comes from the correct activity
-//        if (requestCode == 65) {
-//            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
-//
-//            switch (response.getType()) {
-//                // Response was successful and contains auth token
-//                case TOKEN:
-//                    // Handle successful response
-//
-////                    Log.e("TOKEN", response.getAccessToken() );
-//
-//                    break;
-//
-//                // Auth flow returned an error
-//                case ERROR:
-//                    // Handle error response
-//                    break;
-//
-//                // Most likely auth flow was cancelled
-//                default:
-//                    // Handle other cases
-//            }
-//        }
-//    }
-
 
     public static String getAccessToken(){
         if (accessToken != null) return accessToken;
@@ -163,13 +147,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void ConnectToRemote(){
             SpotifyAppRemoteConnector.Connect(MainActivity.this);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
-                    if (_SpotifyAppRemote != null) {
-                        Load();
-                    }
+            new Handler().postDelayed(() -> {
+                _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
+                if (_SpotifyAppRemote != null) {
+                    Load();
                 }
             }, 3000);
 
@@ -198,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }));
             }
+//            _SpotifyAppRemote.getContentApi().
     }
 
 

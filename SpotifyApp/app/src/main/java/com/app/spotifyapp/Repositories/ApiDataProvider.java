@@ -130,7 +130,7 @@ public class ApiDataProvider {
                             for (int i = 0; i < items.length(); i++) {
                                 JSONObject album = items.getJSONObject(i);
                                 name = album.getString("name");
-                                uri = album.getString("href").substring(34);
+                                uri = album.getString("id");
                                 duration = album.getLong("duration_ms");
                                 TrackDAO track = new TrackDAO(name, uri, duration, albumImg, null);
                                 tracks.add(track);
