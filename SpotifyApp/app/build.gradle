@@ -28,18 +28,33 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+
+    sourceSets{
+        main {
+            res.srcDirs = [
+                    'src\\main\\res', 'src\\main\\res\\layout\\listviews'
+            ]
+        }
+    }
+    namespace 'com.app.spotifyapp'
 }
 
 dependencies {
+    implementation 'androidx.activity:activity-ktx:1.4.0'
+    implementation 'androidx.fragment:fragment-ktx:1.4.0'
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.spotify.android:auth:1.2.4'
+    implementation 'com.spotify.android:auth:1.2.5'
     implementation "com.google.code.gson:gson:2.10.1"
     implementation files('libs/spotify-app-remote-release-0.7.2.aar')
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
+
+    implementation 'org.jsoup:jsoup:1.14.2'
 
 
     implementation 'androidx.appcompat:appcompat:1.5.0'

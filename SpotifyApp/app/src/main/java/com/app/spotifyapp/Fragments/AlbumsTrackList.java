@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
 import com.app.spotifyapp.Interfaces.OnTrackClickListener;
-import com.app.spotifyapp.Interfaces.TrackDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
@@ -41,7 +41,7 @@ public class AlbumsTrackList extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ConnectToRemote();
+        _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
         _binding = FragmentAlbumsTrackListBinding.inflate(inflater, container, false);
         return _binding.getRoot();
     }
@@ -59,10 +59,6 @@ public class AlbumsTrackList extends Fragment {
         }
     }
 
-    public void ConnectToRemote(){
-        SpotifyAppRemoteConnector.Connect(getActivity());
-        _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
-    }
 
     public void getTracks(String href){
         final ArrayList<TrackDAO>[] trackData = new ArrayList[]{new ArrayList<>()} ;
@@ -79,7 +75,7 @@ public class AlbumsTrackList extends Fragment {
                 if (_SpotifyAppRemote != null) {
                     _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + hrefs.get(position));
                     Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                    intent.putExtra("TrackHref" ,hrefs.get(position));
+                    intent.putExtra("TrackHref", hrefs.get(position));
                     startActivity(intent);
                 }
             }

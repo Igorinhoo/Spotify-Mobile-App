@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="5dp"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/topArtistPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_centerVertical="true"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/topArtistName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@+id/topArtistPosition"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+             />
+
+        <ImageView
+            android:id="@+id/topArtistImg"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:scaleType="fitEnd"
+            android:contentDescription="Artist's Profile Image" />
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

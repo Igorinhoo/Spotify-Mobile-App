@@ -4,15 +4,17 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.app.spotifyapp.Interfaces.AlbumDataCallback;
-import com.app.spotifyapp.Interfaces.ArtistDataCallback;
-import com.app.spotifyapp.Interfaces.SingleTrackCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.TopArtistsCallback;
 import com.app.spotifyapp.Interfaces.StringCallback;
-import com.app.spotifyapp.Interfaces.TrackDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
+import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.Services.AccessToken;
+import com.spotify.protocol.types.Artist;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,6 +22,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -29,16 +32,16 @@ import okhttp3.Response;
 
 
 public class ApiDataProvider {
-    private static final String CLIENT_ID = "8595ceb3423c45aca5775efb610b48b7";
-    private static final String CLIENT_SECRET = "64b2842d19b048b79d1cf634b73d4599";
+
     private final OkHttpClient client = new OkHttpClient();
 
     private final ArrayList<AlbumDAO> albums = new ArrayList<>();
     private final ArrayList<ArtistDAO> artists = new ArrayList<>();
     private final ArrayList<TrackDAO> tracks = new ArrayList<>();
 
+
     public final void getArtistsAlbums(String data, String scope, AlbumDataCallback albumCallback) {
-        AccessToken.getInstance().getAccessToken(CLIENT_ID, CLIENT_SECRET, new StringCallback() {
+        AccessToken.getInstance().getAccessToken(new StringCallback() {
             @Override
             public void onResponse(String accessToken) {
                 Request request = new Request.Builder()
@@ -101,9 +104,8 @@ public class ApiDataProvider {
         });
     }
 
-
     public final void getAlbumTracks(String href, String albumImg, TrackDataCallback trackCallback) {
-        AccessToken.getInstance().getAccessToken(CLIENT_ID, CLIENT_SECRET, new StringCallback() {
+        AccessToken.getInstance().getAccessToken(new StringCallback() {
             @Override
             public void onResponse(String accessToken) {
                 Request request = new Request.Builder()
@@ -130,7 +132,7 @@ public class ApiDataProvider {
                                 name = album.getString("name");
                                 uri = album.getString("href").substring(34);
                                 duration = album.getLong("duration_ms");
-                                TrackDAO track = new TrackDAO(name, uri, duration, albumImg);
+                                TrackDAO track = new TrackDAO(name, uri, duration, albumImg, null);
                                 tracks.add(track);
                             }
                             trackCallback.onTrackDataReceived(tracks);
@@ -159,7 +161,7 @@ public class ApiDataProvider {
     }
 
     public final void getArtists(List<String> data, ArtistDataCallback artistsCallback) {
-        AccessToken.getInstance().getAccessToken(CLIENT_ID, CLIENT_SECRET, new StringCallback() {
+        AccessToken.getInstance().getAccessToken(new StringCallback() {
             @Override
             public void onResponse(String accessToken) {
 
@@ -187,8 +189,8 @@ public class ApiDataProvider {
                                     name = artist.getString("name");
                                     Img = artist.getJSONArray("images").getJSONObject(0).getString("url");
                                     uri = artist.getString("id");
-                                    ArtistDAO track = new ArtistDAO(name, Img, uri);
-                                    artists.add(track);
+                                    ArtistDAO arti = new ArtistDAO(name, Img, uri);
+                                    artists.add(arti);
 
                                 }
                                 artistsCallback.onArtistsDataReceived(artists);
@@ -220,7 +222,11 @@ public class ApiDataProvider {
             }
         });
     }
+
+
+
 }
+
 
 //
 //    public final void getTrack(String href, SingleTrackCallback trackCallback){

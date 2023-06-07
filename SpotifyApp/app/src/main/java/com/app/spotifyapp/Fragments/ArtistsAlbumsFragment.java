@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.app.spotifyapp.Adapters.AlbumsRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.AlbumDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
 import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
@@ -39,8 +39,6 @@ public class ArtistsAlbumsFragment extends Fragment {
     private void logError(Throwable error) {
         System.err.println("Error occurred: " + error.getMessage());
     }
-
-
     private FragmentArtistsAlbumsBinding _binding;
 
     @Override
@@ -58,7 +56,7 @@ public class ArtistsAlbumsFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
+//        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
     }
 
     @Override

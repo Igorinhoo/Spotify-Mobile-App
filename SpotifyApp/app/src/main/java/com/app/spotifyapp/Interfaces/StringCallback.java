@@ -10,13 +10,14 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public abstract class StringCallback implements Callback {
+
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         String responseJson = response.body().string();
         try {
             JSONObject json = new JSONObject(responseJson);
             String accessToken = json.getString("access_token");
-            onResponse(accessToken); // Pass accessToken as a String parameter
+            onResponse(accessToken);
         } catch (JSONException e) {
             onFailure(e);
         }

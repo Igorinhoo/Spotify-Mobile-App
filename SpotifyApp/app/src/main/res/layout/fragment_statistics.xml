@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.StatisticsFragment">
+
+    <LinearLayout
+        android:id="@+id/tx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/tracks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tracks"/>
+
+
+        <Button
+            android:id="@+id/artists"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Artists"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/xxxxxxx"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tx"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/topTracksRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:listitem="@layout/top_tracks"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/topItemsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:listitem="@layout/top_artists"
+
+            />
+
+
+    </LinearLayout>
+</RelativeLayout>
