@@ -1,10 +1,12 @@
 package com.app.spotifyapp.Repositories;
 
 
+import android.app.Dialog;
 import android.util.Log;
 
 import com.app.spotifyapp.Interfaces.APIProviders.PlaylistsAPI;
 import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.SingleAlbumCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.Models.TrackDAO;
@@ -28,7 +30,7 @@ import okhttp3.Response;
 
 public class PlaylistsAPIProvider implements PlaylistsAPI {
     private final OkHttpClient client = new OkHttpClient();
-    private String AccessToken = "";
+    private final String AccessToken;
     private String USER_ID = "";
 
     public PlaylistsAPIProvider(String access){
@@ -49,7 +51,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 }
                 try {
                     JSONObject json = new JSONObject(response.body().string());
-                    Log.e("ID", json.getString("id"));
+//                    Log.e("ID", json.getString("id"));
                     USER_ID = json.getString("id");
                 } catch (Exception e) {
                     Log.e("Call QUEUE Tracks", e.getMessage());
@@ -125,8 +127,9 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                     for(int i = 0; i< items.length(); i++){
                         JSONObject albumJson = items.getJSONObject(i);
                         AlbumDAO playlist = new AlbumDAO(albumJson.getString("name"), albumJson.getString("id"),
-                                albumJson.getJSONArray("images").getJSONObject(0).getString("url"));
+                                albumJson.getJSONArray("images").getJSONObject(0).getString("url"), albumJson.getString("snapshot_id"));
                         playlists.add(playlist);
+//                        Log.e( "onResponse: ", playlist.SnapshotID);
                     }
                     callback.onAlbumDataReceived(playlists);
                 } catch (Exception e) {
@@ -141,8 +144,37 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
     }
 
     @Override
+    public void GetPlaylist(String playlistID, SingleAlbumCallback callback) {
+        Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/playlists/"+playlistID+"?market=GB")
+                .header("Authorization", "Bearer " + AccessToken)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
+                    return;
+                }
+                try {
+
+                    JSONObject json = new JSONObject(response.body().string());
+                    AlbumDAO playlist = new AlbumDAO(json.getString("name"), json.getString("id"), json.getJSONArray("images").getJSONObject(0).getString("url"),
+                            json.getString("snapshot_id"));
+                    callback.onAlbumDataReceived(playlist);
+                } catch (Exception e) {
+                    Log.e("Call Get Playlist", e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+        });
+    }
+
+    @Override
     public void GetPlaylistItems(String PlaylistID, TrackDataCallback callback) {
-        Log.e( "GetPlaylistItems: ", PlaylistID);
         Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/playlists/" + PlaylistID + "/tracks?market=GB&limit=50")
                 .header("Authorization", "Bearer " + AccessToken)
@@ -165,12 +197,11 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                                 track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"), null);
                         tracks.add(trackDAO);
 
-                        Log.e("TRACKS Name", track.getString("name"));
                     }
 
                     callback.onTrackDataReceived(tracks);
                 } catch (Exception e) {
-                    Log.e("Call Get Playlists", e.getMessage());
+                    Log.e("Call Get Playlists Items", e.getMessage());
                 }
             }
 
@@ -226,7 +257,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
     }
 
     @Override
-    public void RemoveFromPlaylist(String PlaylistID, String[] TracksURI) {
+    public void RemoveFromPlaylist(String PlaylistID, String snapshotID, String[] TracksURI, Dialog dialog) {
         JSONArray tracksArray = new JSONArray();
         JSONObject playlistData = new JSONObject();
         try {
@@ -240,9 +271,10 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             e.printStackTrace();
         }
         Log.e("RemoveFromPlaylist: ", tracksArray.toString());
+        Log.e("RemoveFromPlaylistID: ", snapshotID);
         try {
             playlistData.put("tracks", tracksArray);
-            playlistData.put("snapshot_id", "Dont know");
+            playlistData.put("snapshot_id", snapshotID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -251,7 +283,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), playlistData.toString());
 
         Request request = new Request.Builder()
-            .url("https://api.spotify.com/v1/playlists/" + PlaylistID + "/tracks?snapshot_id=Dont know")
+            .url("https://api.spotify.com/v1/playlists/" + PlaylistID + "/tracks")
             .header("Authorization", "Bearer " + AccessToken)
             .delete(requestBody)
             .build();
@@ -265,8 +297,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 }
                 try {
                     JSONObject json = new JSONObject(response.body().string());
-//                    Log.e("ID", json.getString("id"));
-
+                    dialog.dismiss();
                 } catch (Exception e) {
                     Log.e("Call Create Playlists", e.getMessage());
                 }

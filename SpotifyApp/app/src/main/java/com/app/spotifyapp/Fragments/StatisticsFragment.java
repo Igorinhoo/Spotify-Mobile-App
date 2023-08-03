@@ -7,22 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.app.spotifyapp.Adapters.TopArtistsRecyclerViewAdapter;
 import com.app.spotifyapp.Adapters.TopTracksRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.Callbacks.TopArtistsCallback;
-import com.app.spotifyapp.Interfaces.Callbacks.TopTracksCallback;
-import com.app.spotifyapp.Interfaces.Listeners.OnTopArtistClickListener;
-import com.app.spotifyapp.Interfaces.Listeners.OnTopTrackClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
 import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
+import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.StatisticsAPIDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentStatisticsBinding;
@@ -33,8 +32,8 @@ import java.util.ArrayList;
 
 public class StatisticsFragment extends Fragment{
 
-    private ArrayList<ArtistDAO> ArtistData = new ArrayList<>();
-    private ArrayList<TrackDAO> TrackData = new ArrayList<>();
+    private final ArrayList<ArtistDAO> ArtistData = new ArrayList<>();
+    private final ArrayList<TrackDAO> TrackData = new ArrayList<>();
     private SpotifyAppRemote _SpotifyAppRemote;
 
     private FragmentStatisticsBinding _binding;
@@ -51,37 +50,16 @@ public class StatisticsFragment extends Fragment{
         weigth0.setMargins(8,8,8,8);
         weigth1.setMargins(8,8,8,8);
 
-        api.getTopTracks(MainActivity.getAccessToken(), new TopTracksCallback() {
-            @Override
-            public void onTopTracksDataReceived(ArrayList<TrackDAO> trackData) {
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TrackData.addAll(trackData);
-                    }
-                });
-            }
-        });
-        api.getTopArtists(MainActivity.getAccessToken() ,new TopArtistsCallback() {
-            @Override
-            public void onTopArtistsDataReceived(ArrayList<ArtistDAO> artistsData) {
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArtistData.addAll(artistsData);
-                    }
-                });
-            }
-        });
+        api.getTopTracks(MainActivity.getAccessToken(), trackData -> requireActivity().runOnUiThread(() -> TrackData.addAll(trackData)));
+        api.getTopArtists(MainActivity.getAccessToken() , artistsData -> requireActivity().runOnUiThread(() -> ArtistData.addAll(artistsData)));
         _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         _binding = FragmentStatisticsBinding.inflate(inflater, container, false);
-
         return _binding.getRoot();
     }
 
@@ -89,24 +67,28 @@ public class StatisticsFragment extends Fragment{
     public void onStart() {
         super.onStart();
 
-        api.getQUEUE(MainActivity.getAccessToken());
-
+//        api.getQUEUE(MainActivity.getAccessToken());
 
         _binding.tracks.setOnClickListener((view -> {
             _binding.topItemsRecycler.setLayoutParams(weigth0);
             _binding.topTracksRecycler.setLayoutParams(weigth1);
 
             _binding.topTracksRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
-            TopTracksRecyclerViewAdapter adapter = new TopTracksRecyclerViewAdapter(getActivity(), TrackData, new OnTopTrackClickListener() {
+            TopTracksRecyclerViewAdapter adapter = new TopTracksRecyclerViewAdapter(getActivity(), TrackData, new OnTrackClickListener() {
                 @Override
-                public void onItemClick(int position) {
-                    Log.e("onItemClick: ", TrackData.get(position).Name);
+                public void onItemClick(TrackDAO track) {
+                    Log.e("onItemClick: ", track.Name);
                     if (_SpotifyAppRemote != null) {
-                        _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + TrackData.get(position).Uri);
+                        _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
                         Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                        intent.putExtra("TrackHref", TrackData.get(position).Uri);
+                        intent.putExtra("TrackHref", track.Id);
                         startActivity(intent);
                     }
+                }
+
+                @Override
+                public void onLongClick(TrackDAO track) {
+
                 }
             });
             _binding.topTracksRecycler.setAdapter(adapter);
@@ -118,20 +100,16 @@ public class StatisticsFragment extends Fragment{
             _binding.topTracksRecycler.setLayoutParams(weigth0);
 
             _binding.topItemsRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
-            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData, new OnTopArtistClickListener() {
-                @Override
-                public void onItemClick(int position) {
-                    Log.e("onItemClick: ", ArtistData.get(position).Name);
-                    Toast.makeText(requireContext(), ArtistData.get(position).Name, Toast.LENGTH_SHORT).show();
-                }
+            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData, artist -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("artistUri", artist.Id);
+                bundle.putString("artistName", artist.Name);
+                bundle.putString("artistImg", artist.Img);
+
+                Navigation.findNavController(requireView()).navigate(R.id.action_statistics_to_artistAlbumsFragment, bundle);
             });
             _binding.topItemsRecycler.setAdapter(adapter);
         });
-
-
-
-
-
     }
 
     @Override

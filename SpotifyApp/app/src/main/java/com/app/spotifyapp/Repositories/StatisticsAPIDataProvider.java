@@ -10,8 +10,6 @@ import com.app.spotifyapp.Interfaces.Callbacks.TopTracksCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,10 +20,8 @@ import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class StatisticsAPIDataProvider{
@@ -42,17 +38,17 @@ public class StatisticsAPIDataProvider{
                         .build();
                 client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void onResponse(@NonNull Call call, Response response) throws IOException {
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         if (!response.isSuccessful()) {
                             Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                             return;
                         }
                         try {
 
-                            String name = "";
-                            String uri = "";
-                            String Img = "";
-                            JSONObject json = new JSONObject(response.body().string());
+                            String name;
+                            String uri;
+                            String Img;
+                            JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
                             try {
 
                                 JSONArray items = json.getJSONArray("items");
@@ -80,7 +76,7 @@ public class StatisticsAPIDataProvider{
                     }
 
                     @Override
-                    public void onFailure(Call call, IOException e) {
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     }
                 });
     }
@@ -93,17 +89,17 @@ public class StatisticsAPIDataProvider{
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
-                    String name = "";
-                    String uri = "";
-                    long duration = 0L;
-                    String Img = "";
-                    String artists = "";
+                    String name;
+                    String uri;
+                    long duration;
+                    String Img;
+                    String artists;
 
                     JSONObject json = new JSONObject(response.body().string());
 
@@ -121,7 +117,6 @@ public class StatisticsAPIDataProvider{
                             TrackDAO tracks = new TrackDAO(name, uri, duration, Img, artists);
                             topTracks.add(tracks);
                         }
-
                         topTracksCallback.onTopTracksDataReceived(topTracks);
                     } catch (Exception e) {
                         Log.e("Exception", e.getMessage());
@@ -149,13 +144,13 @@ public class StatisticsAPIDataProvider{
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
-                    Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
+                    Log.e("DAMAGE Handler QUEUE", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
 
 
-                    JSONObject json = new JSONObject(response.body().string());
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
 //                    Log.e("QUEUEUEUEUE", json.toString() );
 //                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 //                    Log.e("QUEUE", gson.toJson(gson.fromJson(json.toString(), Object.class)));

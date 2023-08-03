@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.Listeners.OnTopArtistClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -21,9 +21,9 @@ public class TopArtistsRecyclerViewAdapter extends RecyclerView.Adapter<TopArtis
     private Context context;
     private ArrayList<ArtistDAO> data;
 
-    private OnTopArtistClickListener _listener;
+    private OnArtistClickListener _listener;
 
-    public TopArtistsRecyclerViewAdapter(Context context, ArrayList<ArtistDAO> data, OnTopArtistClickListener listener){
+    public TopArtistsRecyclerViewAdapter(Context context, ArrayList<ArtistDAO> data, OnArtistClickListener listener){
         this.context = context;
         this.data = data;
         this._listener = listener;
@@ -42,20 +42,17 @@ public class TopArtistsRecyclerViewAdapter extends RecyclerView.Adapter<TopArtis
                 false);
 
 
-        return new ViewHolder(view, _listener);
+        return new ViewHolder(view, _listener, data);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TopArtistsRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_listener != null) {
-                    _listener.onItemClick(position);
-                }
+        holder.itemView.setOnClickListener(view -> {
+            if (_listener != null) {
+                _listener.onItemClick(data.get(position));
             }
         });
-        holder.place.setText(Integer.toString(position+1));
+        holder.place.setText(String.valueOf(position+1));
         holder.name.setText(data.get(position).Name);
         Picasso.get().load(data.get(position).Img).into(holder.image);
     }
@@ -68,11 +65,12 @@ public class TopArtistsRecyclerViewAdapter extends RecyclerView.Adapter<TopArtis
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView name, place;
-        private ImageView image;
-        private final OnTopArtistClickListener _listener;
+        private final TextView name, place;
+        private final ImageView image;
+        private final OnArtistClickListener _listener;
+        private final ArrayList<ArtistDAO> _data;
 
-        public ViewHolder(@NonNull View itemView, OnTopArtistClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnArtistClickListener listener, ArrayList<ArtistDAO> data) {
             super(itemView);
 
             name = itemView.findViewById(R.id.topArtistName);
@@ -81,11 +79,12 @@ public class TopArtistsRecyclerViewAdapter extends RecyclerView.Adapter<TopArtis
 
             _listener = listener;
             itemView.setOnClickListener(this);
+            _data = data;
         }
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(getAdapterPosition());
+            _listener.onItemClick(_data.get(getAdapterPosition()));
         }
     }
 

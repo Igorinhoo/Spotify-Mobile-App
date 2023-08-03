@@ -25,16 +25,12 @@ public class SpotifyAppRemoteConnector {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         mSpotifyAppRemote = spotifyAppRemote;
                         Log.d(context.getAttributionTag(), "Connected! Yay!");
-                        System.out.println(mSpotifyAppRemote);
-
                     }
                     @Override
                     public void onFailure(Throwable throwable) {
-                        Log.e("Nie dzialajace", throwable.getMessage(), throwable);
+                        Log.e("Not Connected", throwable.getMessage(), throwable);
                     }
         });
-
-
     }
 
     public static SpotifyAppRemote GetAppRemote(){

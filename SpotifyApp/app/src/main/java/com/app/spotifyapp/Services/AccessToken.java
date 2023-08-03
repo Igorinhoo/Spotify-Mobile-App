@@ -1,41 +1,25 @@
     package com.app.spotifyapp.Services;
 
 
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
-import static java.security.AccessController.getContext;
+    import android.util.Base64;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
+    import androidx.annotation.NonNull;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.fragment.app.Fragment;
+    import com.app.spotifyapp.Interfaces.StringCallback;
 
-import com.app.spotifyapp.Interfaces.StringCallback;
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationRequest;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
+    import org.json.JSONException;
+    import org.json.JSONObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+    import java.io.IOException;
+    import java.util.Objects;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Objects;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+    import okhttp3.Call;
+    import okhttp3.Callback;
+    import okhttp3.FormBody;
+    import okhttp3.OkHttpClient;
+    import okhttp3.Request;
+    import okhttp3.RequestBody;
+    import okhttp3.Response;
 
 public class AccessToken {
 
@@ -149,8 +133,8 @@ public class AccessToken {
 
         client.newCall(accessRequest).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseJson = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String responseJson = Objects.requireNonNull(response.body()).string();
                 try {
                     JSONObject json = new JSONObject(responseJson);
                     String accessToken = json.getString("access_token");
@@ -161,7 +145,7 @@ public class AccessToken {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 callback.onFailure(call , e);
             }
         });

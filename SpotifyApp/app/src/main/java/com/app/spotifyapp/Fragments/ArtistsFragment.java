@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,56 +12,59 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.app.spotifyapp.Adapters.ArtistsGridViewAdapter;
-import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
-import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
+import com.app.spotifyapp.Database.FirebaseRepo;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.R;
-import com.app.spotifyapp.Repositories.ApiDataProvider;
 import com.app.spotifyapp.databinding.FragmentArtistsBinding;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ArtistsFragment extends Fragment {
 
     private FragmentArtistsBinding _binding;
-    private GridView coursesGV;
     private final ArrayList<ArtistDAO>[] artistsDatas = new ArrayList[]{new ArrayList<>()};
-
-
+    private ArtistsGridViewAdapter adapter;
+    private FirebaseRepo db;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         _binding = FragmentArtistsBinding.inflate(inflater, container, false);
 
-
-        List<String> artists = new ArrayList<>(
-                Arrays.asList("5K4W6rqBFWDnAN6FQUkS6x", "2YZyLoL8N0Wb9xBt1NhZWg",
-                        "3nFkdlSjzX9mRTtwJOzDYB", "0Y5tJX1MQlPlqiwlOH1tJY",
-                        "20qISvAhX20dpIbOOzGK3q", "3TVXtAsR1Inumwj472S9r4",
-                        "0eDvMgVFoNV3TpwtrVCoTj", "2pAWfrd7WFF3XhVt9GooDL",
-                        "13ubrt8QOOCPljQ2FL1Kca", "1Xyo4u8uXC1ZmMpatF05PJ",
-                        "4V8LLVI7PbaPR0K2TGSxFF", "1RyvyyTE3xzB2ZywiAwp0i"));
+        db = FirebaseRepo.getInstance();
+        db.setRef();
 
 
         ArrayList<ArtistDAO> finalArtistsData = artistsDatas[0];
 
-        ArtistsGridViewAdapter adapter = new ArtistsGridViewAdapter(requireActivity(), finalArtistsData);
-        adapter.setOnArtistClickListener(new OnArtistClickListener() {
-            @Override
-            public void onItemClick(ArtistDAO artist) {
-                Bundle bundle = new Bundle();
-                bundle.putString("artistUri", artist.Uri);
-                bundle.putString("artistName", artist.Name);
-                Navigation.findNavController(requireView()).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
-            }
+        adapter = new ArtistsGridViewAdapter(requireActivity(), finalArtistsData);
+        adapter.setOnArtistClickListener(artist -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("artistUri", artist.Id);
+            bundle.putString("artistName", artist.Name);
+            bundle.putString("artistImg", artist.Img);
+            Navigation.findNavController(requireView()).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
+        });
+
+        adapter.setOnArtistLongClickListener(artist -> {
+            requireActivity().runOnUiThread(()->{
+                Toast.makeText(requireContext(), "Deleting " + artist.Name, Toast.LENGTH_SHORT).show();
+                db.Delete(artist);
+                artistsDatas[0].remove(artist);
+                adapter.UpdateData(artistsDatas[0]);
+                adapter.notifyDataSetChanged();
+            });
+
         });
 
         _binding.gvArtists.setAdapter(adapter);
-        getArtists(artists, adapter);
 
+        db.SelectYours(artistsData -> {
+            artistsDatas[0].clear();
+            artistsDatas[0].addAll(artistsData);
+            adapter.UpdateData(artistsData);
+            adapter.notifyDataSetChanged();
+        });
 
         return _binding.getRoot();
     }
@@ -69,31 +72,14 @@ public class ArtistsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-
-
-
-    }
-
-
-    public void getArtists(List<String> ids, ArtistsGridViewAdapter adapter){
-        ApiDataProvider api = new ApiDataProvider();
-        api.getArtists(ids, new ArtistDataCallback() {
-            @Override
-            public void onArtistsDataReceived(ArrayList<ArtistDAO> artistsData) {
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        artistsDatas[0].clear();
-                        artistsDatas[0].addAll(artistsData);
-                        adapter.UpdateData(artistsData);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
+        _binding.delete.setOnClickListener(v ->{
+            db.dele();
+            artistsDatas[0].clear();
+            adapter.UpdateData(artistsDatas[0]);
+            adapter.notifyDataSetChanged();
         });
     }
+
 
     @Override
     public void onDestroyView() {

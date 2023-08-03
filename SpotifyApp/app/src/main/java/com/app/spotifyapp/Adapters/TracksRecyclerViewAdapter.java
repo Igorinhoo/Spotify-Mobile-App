@@ -1,6 +1,8 @@
 package com.app.spotifyapp.Adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +18,15 @@ import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecyclerViewAdapter.ViewHolder>{
-    private Context context;
 
     private ArrayList<TrackDAO> data;
 
-    private OnTrackClickListener _listener;
+    private final OnTrackClickListener _listener;
 
     public TracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTrackClickListener listener){
-        this.context = context;
         this.data = data;
         this._listener = listener;
     }
@@ -42,8 +41,7 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
         long sec = TimeUnit.MILLISECONDS.toSeconds(time) -
                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 
-        String result = min + ":" + (sec < 10 ? "0" + sec : sec);
-        return result;
+        return min + ":" + (sec < 10 ? "0" + sec : sec);
     }
 
     @NonNull
@@ -59,20 +57,25 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
 
     @Override
     public void onBindViewHolder(@NonNull TracksRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_listener != null) {
-                    _listener.onItemClick(data.get(position));
-                }
+        final int currentPosition = position;
+        holder.itemView.setOnClickListener(view -> {
+            if (_listener != null) {
+                _listener.onItemClick(data.get(currentPosition));
             }
         });
 
-        holder.itemView.setOnLongClickListener(view -> {
-            if (_listener != null) {
-                _listener.onLongClick(data.get(position));
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            private final Handler longClickHandler = new Handler(Looper.getMainLooper());
+            @Override
+            public boolean onLongClick(View view) {
+                longClickHandler.postDelayed(() -> {
+                    if (_listener != null) {
+                        _listener.onLongClick(data.get(currentPosition));
+                    }
+                }, 500);
+
+                return true;
             }
-            return false;
         });
 
         holder.name.setText(data.get(position).Name);
@@ -88,10 +91,10 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
-        private TextView name, duration;
-        private ImageView image;
-        private OnTrackClickListener _listener;
-        private ArrayList<TrackDAO> _data;
+        private final TextView name, duration;
+        private final ImageView image;
+        private final OnTrackClickListener _listener;
+        private final ArrayList<TrackDAO> _data;
 
         public ViewHolder(@NonNull View itemView, OnTrackClickListener listener, ArrayList<TrackDAO> data) {
             super(itemView);
@@ -103,6 +106,7 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
             _listener = listener;
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
+
             _data = data;
         }
 
@@ -110,10 +114,12 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
         public void onClick(View view) {
             _listener.onItemClick(_data.get(getAdapterPosition()));
         }
+
         @Override
         public boolean onLongClick(View view) {
             _listener.onLongClick(_data.get(getAdapterPosition()));
-            return false;
+            return true;
+
         }
     }
 

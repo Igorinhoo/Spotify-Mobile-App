@@ -3,12 +3,13 @@ package com.app.spotifyapp.Models;
 public class ArtistDAO {
     public String Name;
     public String Img;
-    public String Uri;
+    public String Id;
 
-    public ArtistDAO(String Name, String Img, String Uri){
+    public ArtistDAO(){}
+    public ArtistDAO(String Name, String Img, String Id){
         this.Name = Name;
         this.Img = Img;
-        this.Uri = Uri;
+        this.Id = Id;
     }
 
 

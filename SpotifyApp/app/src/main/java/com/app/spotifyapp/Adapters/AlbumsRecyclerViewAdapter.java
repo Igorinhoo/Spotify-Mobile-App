@@ -41,14 +41,14 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
                 false);
 
 
-        return new ViewHolder(view, _listener);
+        return new ViewHolder(view, _listener, data);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AlbumsRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.itemView.setOnClickListener(view -> {
             if (_listener != null) {
-                _listener.onItemClick(position);
+                _listener.onItemClick(data.get(position));
             }
         });
 
@@ -67,19 +67,21 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         private TextView name;
         private ImageView image;
         private OnAlbumClickListener _listener;
+        private ArrayList<AlbumDAO> _data;
 
-        public ViewHolder(@NonNull View itemView, OnAlbumClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnAlbumClickListener listener, ArrayList<AlbumDAO> data) {
             super(itemView);
 
             name = itemView.findViewById(R.id.albumName);
             image = itemView.findViewById(R.id.albumImage);
             _listener = listener;
             itemView.setOnClickListener(this);
+            _data = data;
         }
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(getAdapterPosition());
+            _listener.onItemClick(_data.get(getAdapterPosition()));
         }
         
 

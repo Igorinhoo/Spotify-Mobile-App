@@ -10,12 +10,12 @@
     app:cardElevation="5dp">
 
     <LinearLayout
+        android:id="@+id/cardViewLinear"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:paddingVertical="10dp"
         android:orientation="vertical"
-        android:background="#676A6A"
-        >
+        android:background="#676A6A">
 
         <ImageView
             android:id="@+id/idIVcourse"
