@@ -9,7 +9,7 @@ import com.app.spotifyapp.Interfaces.Callbacks.TopArtistsCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TopTracksCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
-import com.app.spotifyapp.Models.TrackDAO;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,64 +31,24 @@ public class StatisticsAPIDataProvider{
     private final ArrayList<TrackDAO> topTracks = new ArrayList<>();
 
 
-    /*private AuthorizationCallback authorizationCallback;
-
-    public void setAuthorizationCallback(AuthorizationCallback callback) {
-        this.authorizationCallback = callback;
-    }
-
-    public void initiateAuthorization(Activity activity) {
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder("8595ceb3423c45aca5775efb610b48b7",
-                AuthorizationResponse.Type.TOKEN, "com.app.SpotifyApp://callback");
-
-        builder.setScopes(new String[]{"user-top-read"});
-        AuthorizationRequest request = builder.build();
-
-        Intent intent = AuthorizationClient.createLoginActivityIntent(activity, request);
-        activity.startActivityForResult(intent, 1);
-
-    }
-
-    public void handleAuthorizationResult(int resultCode, Intent data) {
-        Log.e( "handleAuthorizationResult: ", "WORK" );
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
-
-            if (authorizationCallback != null) {
-                switch (response.getType()) {
-                    case TOKEN:
-                        String accessToken = response.getAccessToken();
-                        Log.e( "handleAuthorizationR ", accessToken );
-                        authorizationCallback.onAuthorizationResult(accessToken);
-                        break;
-                    case ERROR:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-*/
-
     public final void getTopArtists(String accessToken ,TopArtistsCallback topArtistsCallback) {
                 Request request = new Request.Builder()
-                        .url("https://api.spotify.com/v1/me/top/artists?limit=50")
+                        .url("https://api.spotify.com/v1/me/top/artists?limit=50&time_range=long_term")
                         .header("Authorization", "Bearer " + accessToken)
                         .build();
                 client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void onResponse(@NonNull Call call, Response response) throws IOException {
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         if (!response.isSuccessful()) {
                             Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                             return;
                         }
                         try {
 
-                            String name = "";
-                            String uri = "";
-                            String Img = "";
-                            JSONObject json = new JSONObject(response.body().string());
+                            String name;
+                            String uri;
+                            String Img;
+                            JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
                             try {
 
                                 JSONArray items = json.getJSONArray("items");
@@ -116,7 +76,7 @@ public class StatisticsAPIDataProvider{
                     }
 
                     @Override
-                    public void onFailure(Call call, IOException e) {
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     }
                 });
     }
@@ -129,20 +89,20 @@ public class StatisticsAPIDataProvider{
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
-                    String name = "";
-                    String uri = "";
-                    long duration = 0L;
-                    String Img = "";
-                    String artists = "";
+                    String name;
+                    String uri;
+                    long duration;
+                    String Img;
+                    String artists;
 
                     JSONObject json = new JSONObject(response.body().string());
-                    Log.e("JSON TOP TracksTS", json.toString() );
+
                     try {
                         JSONArray items = json.getJSONArray("items");
 
@@ -157,8 +117,6 @@ public class StatisticsAPIDataProvider{
                             TrackDAO tracks = new TrackDAO(name, uri, duration, Img, artists);
                             topTracks.add(tracks);
                         }
-
-
                         topTracksCallback.onTopTracksDataReceived(topTracks);
                     } catch (Exception e) {
                         Log.e("Exception", e.getMessage());
@@ -177,27 +135,54 @@ public class StatisticsAPIDataProvider{
     }
 
 
-/*
-    public static void authorize(Context context, AuthorizationCallback callback) {
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(
-                    "8595ceb3423c45aca5775efb610b48b7",
-                    AuthorizationResponse.Type.TOKEN,
-                    "com.app.SpotifyApp://callback"
-            );
+    public final void getQUEUE(String accessToken) {
+        Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/player/queue?market=GB&limit=50")
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Log.e("DAMAGE Handler QUEUE", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
+                    return;
+                }
+                try {
 
-            builder.setScopes(new String[]{"user-top-read"});
-            AuthorizationRequest request = builder.build();
 
-            Intent intent = AuthorizationClient.createLoginActivityIntent(context, request);
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
+//                    Log.e("QUEUEUEUEUE", json.toString() );
+//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    Log.e("QUEUE", gson.toJson(gson.fromJson(json.toString(), Object.class)));
+                    try {
+                        Gson gso = new Gson();
+                        QueueResponse queueResponse = gso.fromJson(json.toString(), QueueResponse.class);
+                        QueueItem[] queueItems = queueResponse.getQueueItems();
+                        Log.e("QUEUEs", Integer.toString(queueItems.length));
 
-            // Start the activity using startActivityForResult
-            if (context instanceof Activity) {
-                ((Activity) context).startActivityForResult(intent, 65);
-            } else {
-                // Handle the case where the context is not an Activity
+                        for (QueueItem queueItem : queueItems) {
+                            String songName = queueItem.getTrack();
+                            // Do something with the song name
+                                                   Log.e("QUEUE", songName);
+
+                        }
+//                        CurrentlyPlaying currentlyPlaying = gso.fromJson(json.toString(), CurrentlyPlaying.class);
+//                        String songName = currentlyPlaying.getCurrentlyPlaying().getName();
+//                        Log.e("QUEUE", songName);
+
+                    }catch(Exception e){
+                        Log.e( "onResponsesss: ", e.getMessage() );
+                    }
+                } catch (Exception e) {
+                    Log.e("Call QUEUE Tracks", e.getMessage());
+                }
             }
-        }*/
 
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+        });
+    }
 }
 
 

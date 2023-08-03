@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnAlbumClickListener;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -41,23 +41,19 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
                 false);
 
 
-        return new ViewHolder(view, _listener);
+        return new ViewHolder(view, _listener, data);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AlbumsRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_listener != null) {
-                    _listener.onItemClick(position);
-                }
+        holder.itemView.setOnClickListener(view -> {
+            if (_listener != null) {
+                _listener.onItemClick(data.get(position));
             }
         });
 
-        holder.name.setText(data.get(position).AlbumName);
-        Picasso.get().load(data.get(position).AlbumImg).into(holder.image);
-//        data.get(position).getThird()
+        holder.name.setText(data.get(position).Name);
+        Picasso.get().load(data.get(position).Img).into(holder.image);
     }
     @Override
     public int getItemCount() {
@@ -71,20 +67,25 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         private TextView name;
         private ImageView image;
         private OnAlbumClickListener _listener;
+        private ArrayList<AlbumDAO> _data;
 
-        public ViewHolder(@NonNull View itemView, OnAlbumClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnAlbumClickListener listener, ArrayList<AlbumDAO> data) {
             super(itemView);
 
             name = itemView.findViewById(R.id.albumName);
             image = itemView.findViewById(R.id.albumImage);
             _listener = listener;
             itemView.setOnClickListener(this);
+            _data = data;
         }
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(getAdapterPosition());
+            _listener.onItemClick(_data.get(getAdapterPosition()));
         }
+        
+
+
     }
 
 }

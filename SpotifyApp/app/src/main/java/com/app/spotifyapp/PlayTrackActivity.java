@@ -1,42 +1,33 @@
 package com.app.spotifyapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.AsyncTask;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.app.spotifyapp.Fragments.StatisticsFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.app.spotifyapp.Fragments.LyricsFragment;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.ActivityPlayTrackBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.types.Artist;
 import com.spotify.protocol.types.Image;
-import com.spotify.protocol.types.PlayerState;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class PlayTrackActivity extends AppCompatActivity {
 
@@ -47,7 +38,7 @@ public class PlayTrackActivity extends AppCompatActivity {
     SeekBar mSeekBar;
     TextView durationStart;
 
-
+    // TODO: 8/2/2023 Make moving between lyrics and cover image fragments
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +46,29 @@ public class PlayTrackActivity extends AppCompatActivity {
         View view = _binding.getRoot();
         setContentView(view);
 
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.playTrackContainerView);
+        NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
+
+//        _binding.toLyrics.setOnClickListener(view1 -> {
+//            startActivity(new Intent(this, FloatingActivity.class));
+//        });
+
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+
+//        fragmentTransaction.add(R.id.lyricsContainerView, fragment);
+//        fragmentTransaction.commit();
+
+//        _binding.lyr.setOnClickListener(view1 -> {
+//            Intent intent = new Intent(this, FloatingActivity.class);
+//            startActivity(intent);
+//        });
+
         durationStart = findViewById(R.id.durationStart);
         mSeekBar = findViewById(R.id.seek_to_bar);
-        mSeekBar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        mSeekBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        mSeekBar.getProgressDrawable().setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP));
+        mSeekBar.getIndeterminateDrawable().setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP));
         mTrackProgressBar = new TrackProgressBar(mSeekBar);
 
         _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
@@ -69,30 +79,24 @@ public class PlayTrackActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        LyricsFragment fragment = new LyricsFragment();
+
 
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    StringJoiner names = new StringJoiner(", ");
-                    _binding.playTrackName.setText(playerState.track.name);
-                    for (Artist artist : playerState.track.artists) {
-                        names.add(artist.name);
-                    }
-                    _binding.playTrackArtists.setText(names.toString());
-                    _binding.durationEnd.setText(timeToDuration(playerState.track.duration));
-
-                    getLyrics(playerState.track.name, playerState.track.artist.name);
-
-
-                    _SpotifyAppRemote
-                            .getImagesApi()
-                            .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
-                            .setResultCallback(
-                                    bitmap -> {
-                                        _binding.trackImage.setImageBitmap(bitmap);
-                                    });
+            runOnUiThread(() -> {
+                StringJoiner names = new StringJoiner(", ");
+                _binding.playTrackName.setText(playerState.track.name);
+                for (Artist artist : playerState.track.artists) {
+                    names.add(artist.name);
                 }
+                _binding.playTrackArtists.setText(names.toString());
+                _binding.durationEnd.setText(timeToDuration(playerState.track.duration));
+
+//                _SpotifyAppRemote
+//                        .getImagesApi()
+//                        .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
+//                        .setResultCallback(
+//                                bitmap -> _binding.trackImage.setImageBitmap(bitmap));
             })
         ));
         trackBar();
@@ -101,7 +105,7 @@ public class PlayTrackActivity extends AppCompatActivity {
         _binding.skipPrevious.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipPrevious());
         _binding.skipNext.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipNext());
 
-        //        ApiDataProvider api = new ApiDataProvider();
+//        ApiDataProvider api = new ApiDataProvider();
 //        api.getTrack(href, new SingleTrackCallback() {
 //            @Override
 //            public void onTrackDataReceived(TrackDAO trackDatas) {
@@ -117,6 +121,7 @@ public class PlayTrackActivity extends AppCompatActivity {
 //            }
 //
 //        });
+
     }
 
     private void trackBar(){
@@ -143,7 +148,7 @@ public class PlayTrackActivity extends AppCompatActivity {
     @Override
     protected void onStop(){
         super.onStop();
-        Log.e("ONSTOP","PLAYTRACK");
+        Log.e("ON STOP","PLAY TRACK");
 
     }
 
@@ -165,13 +170,11 @@ public class PlayTrackActivity extends AppCompatActivity {
                 _SpotifyAppRemote
                         .getPlayerApi()
                         .pause();
-                Log.e("PAUSE", "DONE");
             }else{
                 _binding.playTrack.setImageResource(R.drawable.btn_pause);
                 _SpotifyAppRemote
                         .getPlayerApi()
                         .resume();
-                Log.e("RESUME", "DONE");
             }
         });
     }
@@ -181,105 +184,15 @@ public class PlayTrackActivity extends AppCompatActivity {
         long sec = TimeUnit.MILLISECONDS.toSeconds(time) -
                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 
-        String result = min + ":" + (sec < 10 ? "0" + sec : sec);
-        return result;
+        return min + ":" + (sec < 10 ? "0" + sec : sec);
     }
 
     private void setPlaybackImage(){
-        isPlayingAsync(isPlaying->{
-            _binding.playTrack.setImageResource(isPlaying ? R.drawable.btn_pause : R.drawable.btn_play);
-        });
+        isPlayingAsync(isPlaying-> _binding.playTrack.setImageResource(isPlaying ? R.drawable.btn_pause : R.drawable.btn_play));
     }
 
 
-    private static final String API_BASE_URL = "https://api.genius.com";
-    private static final String API_ACCESS_TOKEN = "dnUj3Cs5M541FM7Tq4rgkB_HjAAdc_-BmcDa4YOrp0UJluq9BP7dKEw-RZakMTvx";
-    public void getLyrics(String artistName, String songTitle) {
-        String url = API_BASE_URL + "/search?q=" + artistName + " " + songTitle;
-        new FetchLyricsTask().execute(url);
-    }
 
-    private String extractLyricsFromHtml(Document doc) {
-        StringBuilder lyrics = new StringBuilder();
-        try {
-            Elements lyricElements = doc.select("div.Lyrics__Container-sc-1ynbvzw-5.Dzxov");
-            for (Element element : lyricElements) {
-                String[] lines = element.html().split("<br>");
-                for (String line : lines) {
-                    lyrics.append(Jsoup.parse(line).text()).append("\n");
-                }
-                lyrics.append("\n");
-            }
-        }catch (Exception e){
-            Log.e("FROM HTML", e.getMessage());
-        }
-
-        return lyrics.toString();
-    }
-
-    private class FetchLyricsTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            OkHttpClient client = new OkHttpClient();
-            try {
-                String url = urls[0];
-
-                Log.e("Lyrics url", url );
-
-                Request request = new Request.Builder()
-                        .url(url)
-                        .addHeader("Authorization", "Bearer " + API_ACCESS_TOKEN)
-                        .addHeader("User-Agent", "Mozilla/5.0")
-                        .build();
-
-                Response response = client.newCall(request).execute();
-
-                String jsonString = response.body().string();
-                JSONObject json = new JSONObject(jsonString);
-                JSONObject responseJson = json.getJSONObject("response");
-
-                JSONObject hitJson = responseJson.getJSONArray("hits").getJSONObject(0);
-                String songId = hitJson.getJSONObject("result").getString("id");
-
-                url = API_BASE_URL + "/songs/" + songId;
-
-                request = new Request.Builder()
-                        .url(url)
-                        .addHeader("Authorization", "Bearer " + API_ACCESS_TOKEN)
-                        .addHeader("User-Agent", "Mozilla/5.0")
-                        .build();
-
-                response = client.newCall(request).execute();
-
-                jsonString = response.body().string();
-                json = new JSONObject(jsonString);
-                JSONObject songJson = json.getJSONObject("response").getJSONObject("song");
-                String lyricsUrl = songJson.getString("url");
-
-                request = new Request.Builder()
-                        .url(lyricsUrl)
-                        .addHeader("User-Agent", "Mozilla/5.0")
-                        .build();
-
-                response = client.newCall(request).execute();
-                String htmlString = response.body().string();
-                return extractLyricsFromHtml(Jsoup.parse(htmlString));
-            } catch (IOException | JSONException e) {
-                Log.e("GeniusAPI", "Error getting lyrics from Genius" + e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String lyrics) {
-            if (lyrics != null) {
-                _binding.songLyrics.setText(lyrics);
-            } else {
-                Log.e("Error Lyrics!+", "There is problem with lyrics form HTML");
-                Toast.makeText(PlayTrackActivity.this, "NO Text for this song", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     public class TrackProgressBar {
         private static final int LOOP_DURATION = 500;
@@ -294,7 +207,7 @@ public class PlayTrackActivity extends AppCompatActivity {
                         int totalSeconds = progress / 1000;
                         int minutes = totalSeconds / 60;
                         int seconds = totalSeconds % 60;
-                        durationStart.setText(String.format("%01d:%02d", minutes, seconds));
+                        durationStart.setText(String.format(Locale.US,"%01d:%02d", minutes, seconds));
                     }
 
                     @Override
@@ -323,7 +236,7 @@ public class PlayTrackActivity extends AppCompatActivity {
         public TrackProgressBar(SeekBar seekBar) {
             mSeekBar = seekBar;
             mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
-            mHandler = new Handler();
+            mHandler = new Handler(Looper.getMainLooper());
         }
 
         public void setDuration(long duration) {

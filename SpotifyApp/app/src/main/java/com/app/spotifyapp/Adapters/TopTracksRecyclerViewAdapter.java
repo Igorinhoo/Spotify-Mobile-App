@@ -10,8 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.OnTopArtistClickListener;
-import com.app.spotifyapp.Interfaces.OnTopTrackClickListener;
+import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -22,9 +21,9 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
     private Context context;
     private ArrayList<TrackDAO> data;
 
-    private OnTopTrackClickListener _listener;
+    private OnTrackClickListener _listener;
 
-    public TopTracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTopTrackClickListener listener) {
+    public TopTracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTrackClickListener listener) {
         this.context = context;
         this.data = data;
         this._listener = listener;
@@ -43,7 +42,7 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
                 false);
 
 
-        return new ViewHolder(view, _listener);
+        return new ViewHolder(view, _listener, data);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
             @Override
             public void onClick(View view) {
                 if (_listener != null) {
-                    _listener.onItemClick(position);
+                    _listener.onItemClick(data.get(position));
                 }
             }
         });
@@ -71,9 +70,10 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView name, artists, place;
         private ImageView image;
-        private final OnTopTrackClickListener _listener;
+        private final OnTrackClickListener _listener;
+        private ArrayList<TrackDAO> _data;
 
-        public ViewHolder(@NonNull View itemView, OnTopTrackClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnTrackClickListener listener, ArrayList<TrackDAO> data) {
             super(itemView);
 
             place = itemView.findViewById(R.id.topTrackPosition);
@@ -83,11 +83,13 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
 
             _listener = listener;
             itemView.setOnClickListener(this);
+
+            _data = data;
         }
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(getAdapterPosition());
+            _listener.onItemClick(_data.get(getAdapterPosition()));
         }
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_play_track"
+    app:startDestination="@id/trackCoverFragment">
+
+    <fragment
+        android:id="@+id/trackCoverFragment"
+        android:name="com.app.spotifyapp.Fragments.TrackCoverFragment"
+        android:label="fragment_track_cover"
+        tools:layout="@layout/fragment_track_cover" >
+        <action
+            android:id="@+id/action_trackCoverFragment_to_lyricsFragment"
+            app:destination="@id/lyricsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lyricsFragment"
+        android:name="com.app.spotifyapp.Fragments.LyricsFragment"
+        android:label="fragment_lyrics"
+        tools:layout="@layout/fragment_lyrics" >
+        <action
+            android:id="@+id/action_lyricsFragment_to_trackCoverFragment"
+            app:destination="@id/trackCoverFragment" />
+    </fragment>
+</navigation>

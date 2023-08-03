@@ -6,7 +6,7 @@
     <corners  android:topLeftRadius="7dp"
         android:topRightRadius="7dp" />
 
-    <solid android:color="@color/cat_white_40" />
+    <solid android:color="#616060" />
     <stroke
         android:width="1dip"
         android:color="@color/black" />

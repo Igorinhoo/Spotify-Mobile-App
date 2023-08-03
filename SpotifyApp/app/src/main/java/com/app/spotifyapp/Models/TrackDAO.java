@@ -3,18 +3,18 @@ package com.app.spotifyapp.Models;
 import androidx.annotation.Nullable;
 
 public class TrackDAO {
-    public String Name;
-    public String Uri;
+    public final String Name;
+    public final String Id;
     @Nullable
-    public String Img;
+    public final String Img;
     @Nullable
-    public String Artists;
-    public Long Duration;
+    public final String Artists;
+    public final Long Duration;
 
 
-    public TrackDAO(String name, String uri, Long duration, @Nullable String img, @Nullable String artists){
+    public TrackDAO(String name, String id, Long duration, @Nullable String img, @Nullable String artists){
         Name = name;
-        Uri = uri;
+        Id = id;
         Img = img;
         Duration = duration;
         Artists = artists;

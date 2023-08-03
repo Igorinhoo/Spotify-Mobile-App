@@ -1,6 +1,8 @@
 package com.app.spotifyapp.Adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.OnAlbumClickListener;
-import com.app.spotifyapp.Interfaces.OnTrackClickListener;
-import com.app.spotifyapp.Models.AlbumDAO;
+import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecyclerViewAdapter.ViewHolder>{
-    private Context context;
+
     private ArrayList<TrackDAO> data;
 
-    private OnTrackClickListener _listener;
+    private final OnTrackClickListener _listener;
 
     public TracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTrackClickListener listener){
-        this.context = context;
         this.data = data;
         this._listener = listener;
     }
@@ -42,8 +41,7 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
         long sec = TimeUnit.MILLISECONDS.toSeconds(time) -
                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 
-        String result = min + ":" + (sec < 10 ? "0" + sec : sec);
-        return result;
+        return min + ":" + (sec < 10 ? "0" + sec : sec);
     }
 
     @NonNull
@@ -54,17 +52,29 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
                 false);
 
 
-        return new ViewHolder(view, _listener);
+        return new ViewHolder(view, _listener, data);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TracksRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        final int currentPosition = position;
+        holder.itemView.setOnClickListener(view -> {
+            if (_listener != null) {
+                _listener.onItemClick(data.get(currentPosition));
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            private final Handler longClickHandler = new Handler(Looper.getMainLooper());
             @Override
-            public void onClick(View view) {
-                if (_listener != null) {
-                    _listener.onItemClick(position);
-                }
+            public boolean onLongClick(View view) {
+                longClickHandler.postDelayed(() -> {
+                    if (_listener != null) {
+                        _listener.onLongClick(data.get(currentPosition));
+                    }
+                }, 500);
+
+                return true;
             }
         });
 
@@ -80,25 +90,36 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
 
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView name, duration;
-        private ImageView image;
-        private OnTrackClickListener _listener;
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
+        private final TextView name, duration;
+        private final ImageView image;
+        private final OnTrackClickListener _listener;
+        private final ArrayList<TrackDAO> _data;
 
-        public ViewHolder(@NonNull View itemView, OnTrackClickListener listener) {
+        public ViewHolder(@NonNull View itemView, OnTrackClickListener listener, ArrayList<TrackDAO> data) {
             super(itemView);
 
             name = itemView.findViewById(R.id.trackName);
             duration = itemView.findViewById(R.id.trackDuration);
-
             image = itemView.findViewById(R.id.albumImage);
+
             _listener = listener;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+
+            _data = data;
         }
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(getAdapterPosition());
+            _listener.onItemClick(_data.get(getAdapterPosition()));
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            _listener.onLongClick(_data.get(getAdapterPosition()));
+            return true;
+
         }
     }
 

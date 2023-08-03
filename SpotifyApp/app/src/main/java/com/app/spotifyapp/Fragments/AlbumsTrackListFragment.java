@@ -2,32 +2,33 @@ package com.app.spotifyapp.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.OnTrackClickListener;
-import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
+import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
+import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
+import com.app.spotifyapp.Repositories.PlaylistsAPIProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentAlbumsTrackListBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-public class AlbumsTrackList extends Fragment {
+public class AlbumsTrackListFragment extends Fragment {
 
-    private final ArrayList<String> hrefs = new ArrayList<>() ;
-    private final ArrayList<String> duration = new ArrayList<>();
     private String img = "";
     private SpotifyAppRemote _SpotifyAppRemote;
 
@@ -35,11 +36,10 @@ public class AlbumsTrackList extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
         _binding = FragmentAlbumsTrackListBinding.inflate(inflater, container, false);
@@ -52,7 +52,6 @@ public class AlbumsTrackList extends Fragment {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-
             img = bundle.getString("albumImg");
             _binding.album.setText(bundle.getString("selectedAlbum"));
             getTracks(bundle.getString("albumHref"));
@@ -67,71 +66,57 @@ public class AlbumsTrackList extends Fragment {
         _binding.trackListRecycler.setLayoutManager(linearLayoutManager);
         ArrayList<TrackDAO> finalTrackData = new ArrayList<>();
 
-        String finalHref = "";
-
         TracksRecyclerViewAdapter adapter = new TracksRecyclerViewAdapter(getActivity(), finalTrackData, new OnTrackClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(TrackDAO track) {
                 if (_SpotifyAppRemote != null) {
-                    _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + hrefs.get(position));
+                    _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
                     Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                    intent.putExtra("TrackHref", hrefs.get(position));
+                    intent.putExtra("TrackHref", track.Id);
                     startActivity(intent);
                 }
             }
-        });
+            @Override
+            public void onLongClick(TrackDAO track) {
+                PlaylistsAPIProvider api = new PlaylistsAPIProvider(MainActivity.getAccessToken());
+                try {
+                    api.AddToPlaylist(MainActivity.getAccessToken(), "7hnrA0Ngd2yNhRdHSWYklL", new String[]{"spotify:track:" + track.Id});
+                    Toast.makeText(requireContext(), "Added " + track.Name , Toast.LENGTH_SHORT).show();
+                    Log.e("onLongClick: ", track.Name);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Not added", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        );
         _binding.trackListRecycler.setAdapter(adapter);
 
         ApiDataProvider api = new ApiDataProvider();
-        finalHref = "https://api.spotify.com/v1/albums/" + href +"/tracks?market=GB&limit=40";
+        String finalHref = "https://api.spotify.com/v1/albums/" + href + "/tracks?market=GB&limit=40";
 
-        api.getAlbumTracks(finalHref, img, new TrackDataCallback() {
-            @Override
-            public void onTrackDataReceived(ArrayList<TrackDAO> trackDatas) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        trackData[0].clear();
-                        trackData[0].addAll(trackDatas);
-                        adapter.UpdateData(trackData[0]);
-
-
-                        for (TrackDAO item : trackDatas
-                        ) {
-                            hrefs.add(item.Uri);
-                        }
-
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-
-        });
+        api.getAlbumTracks(finalHref, img, tracksData -> requireActivity().runOnUiThread(() -> {
+            _binding.tvAlbumLength.setText(GetAlbumLength(tracksData));
+            trackData[0].clear();
+            trackData[0].addAll(tracksData);
+            adapter.UpdateData(trackData[0]);
+            adapter.notifyDataSetChanged();
+        }));
 
     }
 
+    private String GetAlbumLength(ArrayList<TrackDAO> tracksData){
+        long time = tracksData.stream().mapToLong(track -> track.Duration).sum();
 
+        long min = TimeUnit.MILLISECONDS.toMinutes(time);
+        long sec = TimeUnit.MILLISECONDS.toSeconds(time) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
 
+        return min + ":" + (sec < 10 ? "0" + sec : sec);
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         _binding = null;
     }
 }
-
-
-// Subscribe to PlayerState
-//        mSpotifyAppRemote.getPlayerApi()
-//                .subscribeToPlayerState()
-//                .setEventCallback(playerState -> {
-//                    final Track track = playerState.track;
-//                    if (track != null) {
-//                        Log.d("MainActivity", track.name + " by " + track.artist.name);
-////                        Toast.makeText(MainActivity.this, track.name + " by " + track.artist.name, Toast.LENGTH_LONG).show();
-//                    }
-//                    else{
-//                        Log.d("MainActivity", "Not working");
-//
-//                    }
-//
-//                });

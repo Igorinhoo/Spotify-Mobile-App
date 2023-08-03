@@ -5,11 +5,20 @@
         android:icon="@drawable/home"
         android:title="Home"/>
     <item
+        android:id="@+id/search"
+        android:icon="@drawable/search"
+        android:title="Search"
+        />
+    <item
         android:id="@+id/statistics"
         android:icon="@drawable/statistics"
         android:title="Statistics"/>
     <item
         android:id="@+id/playlists"
-        android:title="Playlists"/>
+        android:icon="@drawable/playlist"
+        android:title="Playlists"
+        />
+
+
 
 </menu>

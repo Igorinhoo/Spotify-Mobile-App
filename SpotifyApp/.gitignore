@@ -13,6 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-/app/src/main/java/ActionVIew.java
-/app/src/main/res/layout/app_remote_layout.xml
+/app/libs
+/app/src/main/java/FloatingActivity.java
+
 

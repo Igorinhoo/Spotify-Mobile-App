@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_artist"
+    app:startDestination="@id/ArtistsFragment">
+
+    <fragment
+        android:id="@+id/albumsTrackList"
+        android:name="com.app.spotifyapp.Fragments.AlbumsTrackListFragment"
+        android:label="AlbumsTrackList">
+        <action
+            android:id="@+id/action_albumsTrackList_to_SecondFragment"
+            app:destination="@id/ArtistsAlbumsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ArtistsAlbumsFragment"
+        android:name="com.app.spotifyapp.Fragments.ArtistsAlbumsFragment"
+        android:label="Second Fragment"
+        tools:layout="@layout/fragment_artists_albums">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/ArtistsFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_albumsTrackList"
+            app:destination="@id/albumsTrackList" />
+    </fragment>
+    <fragment
+        android:id="@+id/ArtistsFragment"
+        android:name="com.app.spotifyapp.Fragments.ArtistsFragment"
+        android:label="First Fragment"
+        tools:layout="@layout/fragment_artists">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/ArtistsAlbumsFragment" />
+    </fragment>
+    <action android:id="@+id/action_global_ArtistsAlbumsFragment" app:destination="@id/ArtistsAlbumsFragment" />
+
+</navigation>

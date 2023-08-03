@@ -1,24 +1,18 @@
 package com.app.spotifyapp.Models;
 
-import java.util.ArrayList;
+import androidx.annotation.Nullable;
 
 public class AlbumDAO {
-    public String AlbumName;
-    public String Uri;
-    public String AlbumImg;
+    public final String Name;
+    public final String Id;
+    public final String Img;
+    @Nullable
+    public String SnapshotID;
 
-    public AlbumDAO(String AlbumName, String Uri, String AlbumImg){
-        this.AlbumName = AlbumName;
-        this.Uri = Uri;
-        this.AlbumImg = AlbumImg;
+    public AlbumDAO(String Name, String Id, String Img, @Nullable String SnapshotID) {
+        this.Name = Name;
+        this.Id = Id;
+        this.Img = Img;
+        this.SnapshotID = SnapshotID;
     }
-//
-//    public ArrayList<TrackDAO> albumToTrack(ArrayList<AlbumDAO> albums){
-//        ArrayList<TrackDAO> tracks = new ArrayList<>();
-//        for (AlbumDAO album:albums
-//             ) {
-//            tracks.add(new TrackDAO(album.AlbumName, album.Uri, null, album.AlbumImg));
-//        }
-//        return tracks;
-//    }
 }
