@@ -14,9 +14,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.app.spotifyapp.Fragments.LyricsFragment;
+import com.app.spotifyapp.Repositories.StatisticsAPIDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.ActivityPlayTrackBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
@@ -38,7 +40,6 @@ public class PlayTrackActivity extends AppCompatActivity {
     SeekBar mSeekBar;
     TextView durationStart;
 
-    // TODO: 8/2/2023 Make moving between lyrics and cover image fragments
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +80,6 @@ public class PlayTrackActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        LyricsFragment fragment = new LyricsFragment();
 
 
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->
@@ -91,12 +91,9 @@ public class PlayTrackActivity extends AppCompatActivity {
                 }
                 _binding.playTrackArtists.setText(names.toString());
                 _binding.durationEnd.setText(timeToDuration(playerState.track.duration));
-
-//                _SpotifyAppRemote
-//                        .getImagesApi()
-//                        .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
-//                        .setResultCallback(
-//                                bitmap -> _binding.trackImage.setImageBitmap(bitmap));
+/*
+                StatisticsAPIDataProvider api = new StatisticsAPIDataProvider();
+                api.getQUEUE(MainActivity.getAccessToken());*/
             })
         ));
         trackBar();
@@ -104,6 +101,14 @@ public class PlayTrackActivity extends AppCompatActivity {
         _binding.playTrack.setOnClickListener(view -> Playing());
         _binding.skipPrevious.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipPrevious());
         _binding.skipNext.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipNext());
+
+
+        _binding.btnQUEUE.setOnClickListener(view -> {
+            NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.playTrackContainerView);
+            NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
+//            Navigation.findNavController(view).navigate(R.id.action_trackCoverFragment_to_queueFragment);
+            navController.navigate(R.id.action_trackCoverFragment_to_queueFragment);
+        });
 
 //        ApiDataProvider api = new ApiDataProvider();
 //        api.getTrack(href, new SingleTrackCallback() {

@@ -6,27 +6,28 @@
     tools:context=".Fragments.LyricsFragment"
     android:padding="10dp"
     android:fillViewport="true"
-    android:scrollY="0dp"
-    >
+    android:scrollY="0dp">
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical">-->
-<!--        <Button-->
-<!--            android:id="@+id/toCover"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="To Cover"/>-->
-        <TextView
-            android:id="@+id/songLyrics"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <Button
+            android:id="@+id/btnToFloating"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lyrics of the song..."
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            />
+            android:layout_height="wrap_content"/>
 
-<!--    </LinearLayout>-->
+    <TextView
+        android:id="@+id/songLyrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lyrics of the song..."
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:maxLines="300"
+        />
+    </LinearLayout>
 
 </ScrollView>

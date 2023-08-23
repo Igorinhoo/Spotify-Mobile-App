@@ -72,12 +72,12 @@ public class ArtistsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        _binding.delete.setOnClickListener(v ->{
-            db.dele();
-            artistsDatas[0].clear();
-            adapter.UpdateData(artistsDatas[0]);
-            adapter.notifyDataSetChanged();
-        });
+//        _binding.delete.setOnClickListener(v ->{
+//            db.dele();
+//            artistsDatas[0].clear();
+//            adapter.UpdateData(artistsDatas[0]);
+//            adapter.notifyDataSetChanged();
+//        });
     }
 
 

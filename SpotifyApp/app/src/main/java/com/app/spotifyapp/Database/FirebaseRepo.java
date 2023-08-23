@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FirebaseRepo {
+
+    // TODO: 8/23/2023 Change rules in database to be to different identity 
     private static FirebaseRepo instance;
     private DatabaseReference myRef;
     private static FirebaseDatabase database;

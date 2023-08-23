@@ -52,8 +52,15 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
             }
         });
 
-        holder.name.setText(data.get(position).Name);
-        Picasso.get().load(data.get(position).Img).into(holder.image);
+        holder.name.setText(data.get(position).getName());
+        String img;
+        try{
+            img = data.get(position).getImages()[0].getUrl();
+        }catch (Exception e){
+            img = "https://tinyurl.com/2p8pzm3e";
+        }
+
+        Picasso.get().load(img).into(holder.image);
     }
     @Override
     public int getItemCount() {

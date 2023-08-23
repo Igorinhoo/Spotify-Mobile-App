@@ -18,10 +18,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracksRecyclerViewAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private ArrayList<TrackDAO> data;
-
-    private OnTrackClickListener _listener;
+    private final OnTrackClickListener _listener;
 
     public TopTracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTrackClickListener listener) {
         this.context = context;
@@ -51,7 +50,7 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
             @Override
             public void onClick(View view) {
                 if (_listener != null) {
-                    _listener.onItemClick(data.get(position));
+                    _listener.onItemClick(data.get(position), position);
                 }
             }
         });
@@ -68,10 +67,10 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView name, artists, place;
-        private ImageView image;
+        private final TextView name, artists, place;
+        private final ImageView image;
         private final OnTrackClickListener _listener;
-        private ArrayList<TrackDAO> _data;
+        private final ArrayList<TrackDAO> _data;
 
         public ViewHolder(@NonNull View itemView, OnTrackClickListener listener, ArrayList<TrackDAO> data) {
             super(itemView);
@@ -89,7 +88,7 @@ public class TopTracksRecyclerViewAdapter extends RecyclerView.Adapter<TopTracks
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(_data.get(getAdapterPosition()));
+            _listener.onItemClick(_data.get(getAdapterPosition()), getAdapterPosition());
         }
     }
 

@@ -60,7 +60,7 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
         final int currentPosition = position;
         holder.itemView.setOnClickListener(view -> {
             if (_listener != null) {
-                _listener.onItemClick(data.get(currentPosition));
+                _listener.onItemClick(data.get(currentPosition), currentPosition);
             }
         });
 
@@ -112,7 +112,7 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
 
         @Override
         public void onClick(View view) {
-            _listener.onItemClick(_data.get(getAdapterPosition()));
+            _listener.onItemClick(_data.get(getAdapterPosition()), getAdapterPosition());
         }
 
         @Override

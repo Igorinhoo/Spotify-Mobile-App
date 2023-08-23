@@ -81,30 +81,43 @@
                 />
 
         </RelativeLayout>
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-            <ImageButton
-                android:id="@+id/skipPrevious"
-                android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/btn_prev"
-                android:contentDescription="Skip"
-                />
-            <ImageButton
-                android:id="@+id/playTrack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                android:orientation="horizontal"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/skipPrevious"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/btn_prev"
+                    android:contentDescription="Skip"
+                    />
+                <ImageButton
+                    android:id="@+id/playTrack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
 
+                <ImageButton
+                    android:id="@+id/skipNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/btn_next"
+                    />
+
+            </LinearLayout>
             <ImageButton
-                android:id="@+id/skipNext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/btn_next"
-                />
-        </LinearLayout>
+                android:id="@+id/btnQUEUE"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:src="@drawable/queue"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

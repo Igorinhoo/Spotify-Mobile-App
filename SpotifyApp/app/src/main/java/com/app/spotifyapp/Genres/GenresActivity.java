@@ -155,7 +155,7 @@ public class GenresActivity extends AppCompatActivity {
     }
 
     private void ChangeTVCount(){
-        _binding.tvGenresCount.setText("Select max " + count + " genres");
+        _binding.tvGenresCount.setText(String.format("Select max %d genres", count));
     }
 
 

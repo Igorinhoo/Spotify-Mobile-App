@@ -2,7 +2,6 @@ package com.app.spotifyapp.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.spotifyapp.Adapters.TopArtistsRecyclerViewAdapter;
 import com.app.spotifyapp.Adapters.TopTracksRecyclerViewAdapter;
@@ -37,7 +37,6 @@ public class StatisticsFragment extends Fragment{
     private SpotifyAppRemote _SpotifyAppRemote;
 
     private FragmentStatisticsBinding _binding;
-    private StatisticsAPIDataProvider api;
     private static final LinearLayout.LayoutParams weigth1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
     private static final LinearLayout.LayoutParams weigth0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0, 0);
 
@@ -46,7 +45,7 @@ public class StatisticsFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        api = new StatisticsAPIDataProvider();
+        StatisticsAPIDataProvider api = new StatisticsAPIDataProvider();
         weigth0.setMargins(8,8,8,8);
         weigth1.setMargins(8,8,8,8);
 
@@ -69,15 +68,18 @@ public class StatisticsFragment extends Fragment{
 
 //        api.getQUEUE(MainActivity.getAccessToken());
 
+        // TODO: 8/13/2023 Maybe try fabric to generate Track or Album 
+        
         _binding.tracks.setOnClickListener((view -> {
-            _binding.topItemsRecycler.setLayoutParams(weigth0);
+            _binding.topAlbumsRecycler.setLayoutParams(weigth0);
             _binding.topTracksRecycler.setLayoutParams(weigth1);
 
             _binding.topTracksRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
+            // TODO: 8/13/2023 Try to do it in adapter instead of here 
             TopTracksRecyclerViewAdapter adapter = new TopTracksRecyclerViewAdapter(getActivity(), TrackData, new OnTrackClickListener() {
                 @Override
-                public void onItemClick(TrackDAO track) {
-                    Log.e("onItemClick: ", track.Name);
+                public void onItemClick(TrackDAO track, int pos) {
+                    // TODO: 8/8/2023 Maybe try making own function to play track or playlist 
                     if (_SpotifyAppRemote != null) {
                         _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
                         Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
@@ -96,19 +98,20 @@ public class StatisticsFragment extends Fragment{
 
 
         _binding.artists.setOnClickListener(view -> {
-            _binding.topItemsRecycler.setLayoutParams(weigth1);
+            _binding.topAlbumsRecycler.setLayoutParams(weigth1);
             _binding.topTracksRecycler.setLayoutParams(weigth0);
 
-            _binding.topItemsRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
-            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData, artist -> {
-                Bundle bundle = new Bundle();
-                bundle.putString("artistUri", artist.Id);
-                bundle.putString("artistName", artist.Name);
-                bundle.putString("artistImg", artist.Img);
-
-                Navigation.findNavController(requireView()).navigate(R.id.action_statistics_to_artistAlbumsFragment, bundle);
-            });
-            _binding.topItemsRecycler.setAdapter(adapter);
+            _binding.topAlbumsRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
+//            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData, artist -> {
+//                Bundle bundle = new Bundle();
+//                bundle.putString("artistUri", artist.Id);
+//                bundle.putString("artistName", artist.Name);
+//                bundle.putString("artistImg", artist.Img);
+//
+//                Navigation.findNavController(requireView()).navigate(R.id.action_statistics_to_artistAlbumsFragment, bundle);
+//            });
+            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData);
+            _binding.topAlbumsRecycler.setAdapter(adapter);
         });
     }
 

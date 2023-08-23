@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.app.spotifyapp.Games.GamesActivity;
 import com.app.spotifyapp.Genres.GenresActivity;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -170,5 +172,9 @@ public class MainActivity extends AppCompatActivity {
         Log.e("ON DESTROY","MAIN");
     }
 
+//    public void ToGames(View view) {
+//        startActivity(new Intent(this, GamesActivity.class));
+//
+//    }
 }
 

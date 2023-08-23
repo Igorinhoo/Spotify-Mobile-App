@@ -16,6 +16,7 @@ import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.SearchDAO;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.Services.AccessToken;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,31 +60,54 @@ public class ApiDataProvider {
                             return;
                         }
                         try {
-                            String albumName;
-                            String albumUri;
-                            String albumImg = "";
+
                             JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
+
                             JSONArray items = json.getJSONArray("items");
                             String previousAlbum = "";
                             for (int i = 0; i < items.length(); i++) {
-                                JSONObject albumJson = items.getJSONObject(i);
-                                JSONArray images = albumJson.optJSONArray("images");
-                                if (images != null) {
-                                    albumImg = images.getJSONObject(1).getString("url");
-                                } else {
-                                    Log.e("ARTIST NAME PROBLEMS", "No artists found for album " + albumJson.getString("name"));
-                                }
-                                albumName = albumJson.getString("name");
-                                albumUri = albumJson.getString("id");
-                                if (!albumName.equals(previousAlbum)) {
-                                    AlbumDAO album = new AlbumDAO(albumName, albumUri, albumImg, null);
-                                    albums.add(album);
+                                Gson gson = new Gson();
+                                AlbumDAO albumResponse = gson.fromJson(items.getJSONObject(i).toString(), AlbumDAO.class);
+
+                                if (!albumResponse.getName().equals(previousAlbum)) {
+//                                    AlbumDAO album = new AlbumDAO(albumName, albumUri, albumImg, null);
+                                    albums.add(albumResponse);
 
                                 } else {
                                     continue;
                                 }
-                                previousAlbum = albumName;
+                                previousAlbum = albumResponse.getName();
                             }
+
+
+
+//                            String albumName;
+//                            String albumUri;
+//                            String albumImg = "";
+//                            JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
+//
+//
+//                            JSONArray items = json.getJSONArray("items");
+//                            String previousAlbum = "";
+//                            for (int i = 0; i < items.length(); i++) {
+//                                JSONObject albumJson = items.getJSONObject(i);
+//                                JSONArray images = albumJson.optJSONArray("images");
+//                                if (images != null) {
+//                                    albumImg = images.getJSONObject(1).getString("url");
+//                                } else {
+//                                    Log.e("ARTIST NAME PROBLEMS", "No artists found for album " + albumJson.getString("name"));
+//                                }
+//                                albumName = albumJson.getString("name");
+//                                albumUri = albumJson.getString("id");
+//                                if (!albumName.equals(previousAlbum)) {
+//                                    AlbumDAO album = new AlbumDAO(albumName, albumUri, albumImg, null);
+//                                    albums.add(album);
+//
+//                                } else {
+//                                    continue;
+//                                }
+//                                previousAlbum = albumName;
+//                            }
                             albumCallback.onAlbumDataReceived(albums);
                         } catch (Exception e) {
                             Log.e("Call Artists Albums", "Nie dziala");
@@ -107,12 +131,12 @@ public class ApiDataProvider {
         });
     }
 
-    public final void getAlbumTracks(String href, String albumImg, TrackDataCallback trackCallback) {
+    public final void getAlbumTracks(String Id, String albumImg, TrackDataCallback trackCallback) {
         AccessToken.getInstance().getAccessToken(new StringCallback() {
             @Override
             public void onResponse(String accessToken) {
                 Request request = new Request.Builder()
-                        .url(href)
+                        .url("https://api.spotify.com/v1/albums/" + Id + "/tracks?market=GB&limit=40")
                         .header("Authorization", "Bearer " + accessToken)
                         .build();
                 client.newCall(request).enqueue(new Callback() {
@@ -260,36 +284,16 @@ public class ApiDataProvider {
 
                             //TODO DO when searched more than one type it show most accurate items, not like now (first artists, then albums and then tracks)(not sure how to do it now)
 
-//                            JSONObject searched;
                             if (json.has("artists")){
                                 GetSearchType(json.getJSONObject("artists"));
-//                                searched = json.getJSONObject("artists");
                             }
                             if (json.has("albums")) {
                                 GetSearchType(json.getJSONObject("albums"));
-//                                searched = json.getJSONObject("albums");
                             }
                             if (json.has("tracks")){
                                 GetSearchType(json.getJSONObject("tracks"));
-//                                searched = json.getJSONObject("tracks");
                             }
 
-//                            JSONArray items = searched.getJSONArray("items");
-//
-//                            for (int i = 0; i < items.length(); i++) {
-//                                JSONObject searchList = items.getJSONObject(i);
-//
-//                                name = searchList.getString("name");
-//                                uri = searchList.getString("id");
-//                                type = searchList.getString("type");
-//                                JSONArray images;
-//                                if (type.equals("track")){
-//                                    images = searchList.getJSONObject("album").getJSONArray("images");
-//                                }else images = searchList.getJSONArray("images");
-//
-//                                img = images.length() > 1 ? images.getJSONObject(1).getString("url") : "https://cdn-icons-png.flaticon.com/512/847/847970.png?w=740&t=st=1689538827~exp=1689539427~hmac=a30042782aac879994a47a8f044a202b3fd84279e924c5e771178141b5278e13";
-//                                search.add(new SearchDAO(type,name, img, uri));
-//                            }
                             activity.runOnUiThread(()-> searchCallback.onSearchDataCallback(search));
                         } catch (Exception e) {
                             Log.e("Call Search Tracks", e.getMessage());

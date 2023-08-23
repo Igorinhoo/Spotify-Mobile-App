@@ -12,7 +12,14 @@
         tools:layout="@layout/fragment_track_cover" >
         <action
             android:id="@+id/action_trackCoverFragment_to_lyricsFragment"
-            app:destination="@id/lyricsFragment" />
+            app:destination="@id/lyricsFragment"
+            app:popUpTo="@+id/trackCoverFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_trackCoverFragment_to_queueFragment"
+            app:destination="@id/queueFragment"
+            app:popUpTo="@+id/trackCoverFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/lyricsFragment"
@@ -21,6 +28,29 @@
         tools:layout="@layout/fragment_lyrics" >
         <action
             android:id="@+id/action_lyricsFragment_to_trackCoverFragment"
-            app:destination="@id/trackCoverFragment" />
+            app:destination="@id/trackCoverFragment"
+            app:popUpTo="@+id/lyricsFragment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_lyricsFragment_to_queueFragment"
+            app:destination="@id/queueFragment"
+            app:popUpTo="@+id/queueFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+    <fragment
+        android:id="@+id/queueFragment"
+        android:name="com.app.spotifyapp.Fragments.QueueFragment"
+        android:label="fragment_queue"
+        tools:layout="@layout/fragment_queue" >
+        <action
+            android:id="@+id/action_queueFragment_to_lyricsFragment"
+            app:destination="@id/lyricsFragment"
+            app:popUpTo="@+id/queueFragment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_queueFragment_to_trackCoverFragment"
+            app:destination="@id/trackCoverFragment"
+            app:popUpTo="@+id/queueFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 </navigation>

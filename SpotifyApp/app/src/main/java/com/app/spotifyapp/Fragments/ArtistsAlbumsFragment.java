@@ -75,9 +75,9 @@ public class ArtistsAlbumsFragment extends Fragment {
         ArrayList<AlbumDAO> finalAlbumData = albumData[0];
         final AlbumsRecyclerViewAdapter adapter = new AlbumsRecyclerViewAdapter(getActivity(), finalAlbumData, album -> {
             Bundle bundle = new Bundle();
-            bundle.putString("selectedAlbum", album.Name);
-            bundle.putString("albumHref", album.Id);
-            bundle.putString("albumImg", album.Img);
+            bundle.putString("selectedAlbum", album.getName());
+            bundle.putString("albumHref", album.getId());
+            bundle.putString("albumImg", album.getImages()[0].getUrl());
 
             Navigation.findNavController(requireView()).navigate(R.id.action_SecondFragment_to_albumsTrackList, bundle);
         });

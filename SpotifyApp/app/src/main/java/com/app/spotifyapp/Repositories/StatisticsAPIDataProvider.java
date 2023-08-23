@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.app.spotifyapp.Interfaces.Callbacks.TopArtistsCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TopTracksCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.google.gson.Gson;
@@ -87,6 +88,10 @@ public class StatisticsAPIDataProvider{
                 .url("https://api.spotify.com/v1/me/top/tracks?limit=50&time_range=long_term")
                 .header("Authorization", "Bearer " + accessToken)
                 .build();
+        /*Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/top/tracks?limit=50&time_range=short_term")
+                .header("Authorization", "Bearer " + accessToken)
+                .build();*/
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
@@ -135,7 +140,8 @@ public class StatisticsAPIDataProvider{
     }
 
 
-    public final void getQUEUE(String accessToken) {
+    public final void getQUEUE(String accessToken, TrackDataCallback callback) {
+
         Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/me/player/queue?market=GB&limit=50")
                 .header("Authorization", "Bearer " + accessToken)
@@ -149,29 +155,29 @@ public class StatisticsAPIDataProvider{
                 }
                 try {
 
-
-                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
-//                    Log.e("QUEUEUEUEUE", json.toString() );
-//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    Log.e("QUEUE", gson.toJson(gson.fromJson(json.toString(), Object.class)));
+                    String a = response.body().string();
+                    JSONObject json = new JSONObject(Objects.requireNonNull(a));
+                    Log.e("onResponse: ", a);
                     try {
                         Gson gso = new Gson();
                         QueueResponse queueResponse = gso.fromJson(json.toString(), QueueResponse.class);
                         QueueItem[] queueItems = queueResponse.getQueueItems();
-                        Log.e("QUEUEs", Integer.toString(queueItems.length));
+
+                        ArrayList<TrackDAO> queue = new ArrayList<>();
 
                         for (QueueItem queueItem : queueItems) {
-                            String songName = queueItem.getTrack();
-                            // Do something with the song name
-                                                   Log.e("QUEUE", songName);
+                            String songName = queueItem.getName();
 
+                            Log.e("QUEUE", songName + " " + queueItems.length);
+
+                            queue.add(new TrackDAO(queueItem.getName(), queueItem.getId(), queueItem.getDuration(), queueItem.getAlbum().getImages()[0].getUrl(), null));
                         }
 //                        CurrentlyPlaying currentlyPlaying = gso.fromJson(json.toString(), CurrentlyPlaying.class);
 //                        String songName = currentlyPlaying.getCurrentlyPlaying().getName();
 //                        Log.e("QUEUE", songName);
-
+                        callback.onTrackDataReceived(queue);
                     }catch(Exception e){
-                        Log.e( "onResponsesss: ", e.getMessage() );
+                        Log.e( "on Responsesss: ", e.getMessage() );
                     }
                 } catch (Exception e) {
                     Log.e("Call QUEUE Tracks", e.getMessage());

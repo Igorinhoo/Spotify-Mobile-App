@@ -67,15 +67,15 @@ public class PlaylistsFragment extends Fragment {
     private void GetPlaylists(){
         ArrayList<AlbumDAO> playlists = new ArrayList<>();
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity());
         _binding.rvPlaylists.setLayoutManager(linearLayoutManager);
 
         AlbumsRecyclerViewAdapter adapter = new AlbumsRecyclerViewAdapter(requireContext(), playlists, album -> {
             Bundle bundle = new Bundle();
-            bundle.putString("playlistID", album.Id);
+            bundle.putString("playlistID", album.getId());
             Navigation.findNavController(requireView()).navigate(R.id.action_playlists_to_playlistTrackListFragment, bundle);
 
-            Toast.makeText(requireContext(), album.Name, Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), album.getName(), Toast.LENGTH_LONG).show();
         });
         _binding.rvPlaylists.setAdapter(adapter);
 
