@@ -6,8 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -101,7 +99,7 @@ public class FirebaseRepo {
             myRef.child("YourArtists").child(artist.Id).removeValue();
         }
     }
-    public void dele(){
+    public void DeleteAllUserArtists(){
         myRef.child("YourArtists").removeValue();
     }
 }

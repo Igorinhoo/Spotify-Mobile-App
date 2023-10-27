@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class PlaylistTrackListFragment extends Fragment {
 
-    String PlaylistID;
+    private String PlaylistID;
     private FragmentPlaylistTrackListBinding _binding;
     private PlaylistsAPIProvider api;
     private SpotifyAppRemote _SpotifyAppRemote;
@@ -82,8 +82,8 @@ public class PlaylistTrackListFragment extends Fragment {
         _binding.rvPlaylistTrackList.setLayoutManager(linearLayoutManager);
 
 
-        // TODO: 8/20/2023 Try to do that every recycler view dont have to get new data from API, but it has to be stored for some time
-        adapter = new TracksRecyclerViewAdapter(requireContext(), tracks, new OnTrackClickListener() {
+        // TODO: 8/20/2023 Try to do that every recycler view don't have to get new data from API, but it has to be stored for some time
+        adapter = new TracksRecyclerViewAdapter(tracks, new OnTrackClickListener() {
             @Override
             public void onItemClick(TrackDAO track, int pos) {
                 if (_SpotifyAppRemote != null) {
@@ -97,33 +97,31 @@ public class PlaylistTrackListFragment extends Fragment {
 
             @Override
             public void onLongClick(TrackDAO track) {
-                ShowDialog(track);
+                ShowRemoveDialog(track);
             }
         });
         _binding.rvPlaylistTrackList.setAdapter(adapter);
 
         try {
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                api.GetPlaylistItems(PlaylistID, trackListData -> {
-                    requireActivity().runOnUiThread(() -> {
-                        tracks.clear();
-                        tracks.addAll(trackListData);
-                        adapter.UpdateData(trackListData);
-                        adapter.notifyDataSetChanged();
-                    });
-                });
-            }, 1000);
+            new Handler(Looper.getMainLooper()).postDelayed(() ->
+                    api.GetPlaylistItems(PlaylistID, trackListData ->
+                            requireActivity().runOnUiThread(() -> {
+                                tracks.clear();
+                                tracks.addAll(trackListData);
+                                adapter.UpdateData(trackListData);
+                                adapter.notifyDataSetChanged();
+                            })), 1000);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private void ShowDialog(TrackDAO track){
-        Dialog dialog = new Dialog(requireContext());
+    private void ShowRemoveDialog(TrackDAO track){
+        Dialog dialog = new Dialog(requireContext(), R.style.CustomButtonsDialog);
         dialog.setContentView(R.layout.playlist_dialog);
 
         Button remove = dialog.findViewById(R.id.btn_remove);
-        remove.setOnClickListener(view -> {
+        remove.setOnClickListener(view ->
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 api.GetPlaylist(PlaylistID, albumData -> {
                     try {
@@ -137,8 +135,7 @@ public class PlaylistTrackListFragment extends Fragment {
                     }
                 });
 
-            }, 600);
-        });
+            }, 600));
         dialog.show();
     }
 

@@ -7,9 +7,11 @@
     android:orientation="vertical"
     android:background="@color/black">
 
-    <RelativeLayout
+   <!-- <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="60dp"
+        >
+&lt;!&ndash;        android:padding="10dp"&ndash;&gt;
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
@@ -17,14 +19,39 @@
             android:layout_alignParentStart="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:hint="Search anything..."/>
+            android:hint="Search anything..."
+            android:layout_marginHorizontal="10dp"/>
         <Button
             android:id="@+id/btnSearch"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"
             android:text="Search"/>
-    </RelativeLayout>
+    </RelativeLayout>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:hint="Search anything..."
+            android:layout_marginHorizontal="10dp"/>
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"
+            android:text="Search"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

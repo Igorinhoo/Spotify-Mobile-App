@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="#676A6A">
+        android:background="@color/basicListview">
         <ImageView
             android:id="@+id/albumImage"
             android:layout_width="100dp"

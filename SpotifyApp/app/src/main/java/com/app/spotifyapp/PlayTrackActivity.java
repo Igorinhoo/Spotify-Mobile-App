@@ -1,6 +1,5 @@
 package com.app.spotifyapp;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -13,17 +12,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.app.spotifyapp.Fragments.LyricsFragment;
-import com.app.spotifyapp.Repositories.StatisticsAPIDataProvider;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.ActivityPlayTrackBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.types.Artist;
-import com.spotify.protocol.types.Image;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -50,22 +46,6 @@ public class PlayTrackActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.playTrackContainerView);
         NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
 
-//        _binding.toLyrics.setOnClickListener(view1 -> {
-//            startActivity(new Intent(this, FloatingActivity.class));
-//        });
-
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-
-//        fragmentTransaction.add(R.id.lyricsContainerView, fragment);
-//        fragmentTransaction.commit();
-
-//        _binding.lyr.setOnClickListener(view1 -> {
-//            Intent intent = new Intent(this, FloatingActivity.class);
-//            startActivity(intent);
-//        });
-
         durationStart = findViewById(R.id.durationStart);
         mSeekBar = findViewById(R.id.seek_to_bar);
         mSeekBar.getProgressDrawable().setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP));
@@ -81,6 +61,13 @@ public class PlayTrackActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        _binding.btnChangeLyrics.setOnClickListener((view -> {
+            boolean isAZ = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                    .getBoolean("isAZ", true);
+            getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isAZ", !isAZ).apply();
+        }));
+
 
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->
             runOnUiThread(() -> {
@@ -91,9 +78,6 @@ public class PlayTrackActivity extends AppCompatActivity {
                 }
                 _binding.playTrackArtists.setText(names.toString());
                 _binding.durationEnd.setText(timeToDuration(playerState.track.duration));
-/*
-                StatisticsAPIDataProvider api = new StatisticsAPIDataProvider();
-                api.getQUEUE(MainActivity.getAccessToken());*/
             })
         ));
         trackBar();
@@ -102,31 +86,27 @@ public class PlayTrackActivity extends AppCompatActivity {
         _binding.skipPrevious.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipPrevious());
         _binding.skipNext.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipNext());
 
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.playTrackContainerView);
+        NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
 
         _binding.btnQUEUE.setOnClickListener(view -> {
-            NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.playTrackContainerView);
-            NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
-//            Navigation.findNavController(view).navigate(R.id.action_trackCoverFragment_to_queueFragment);
-            navController.navigate(R.id.action_trackCoverFragment_to_queueFragment);
+
+            if(Objects.requireNonNull(navController.getCurrentDestination()).getId() == R.id.trackCoverFragment){
+                navController.navigate(R.id.action_trackCoverFragment_to_queueFragment);
+                return;
+            }
+            navController.navigate(R.id.action_lyricsFragment_to_queueFragment);
         });
 
-//        ApiDataProvider api = new ApiDataProvider();
-//        api.getTrack(href, new SingleTrackCallback() {
-//            @Override
-//            public void onTrackDataReceived(TrackDAO trackDatas) {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-////
-////                        playTrackName.setText(trackDatas.Name);
-//                        Picasso.get().load(trackDatas.Img).into(trackImage);
-//
-//                    }
-//                });
-//            }
-//
-//        });
-
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.queueFragment) {
+                _binding.btnQUEUE.setEnabled(false);
+                _binding.btnQUEUE.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.queue_unabled));
+            } else {
+                _binding.btnQUEUE.setEnabled(true);
+                _binding.btnQUEUE.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.queue));
+            }
+        });
     }
 
     private void trackBar(){
@@ -171,12 +151,12 @@ public class PlayTrackActivity extends AppCompatActivity {
     private void Playing(){
         isPlayingAsync(isPlaying ->{
             if (isPlaying){
-                _binding.playTrack.setImageResource(R.drawable.btn_play);
+                _binding.playTrack.setImageResource(R.drawable.play_50);
                 _SpotifyAppRemote
                         .getPlayerApi()
                         .pause();
             }else{
-                _binding.playTrack.setImageResource(R.drawable.btn_pause);
+                _binding.playTrack.setImageResource(R.drawable.pause_50);
                 _SpotifyAppRemote
                         .getPlayerApi()
                         .resume();
@@ -193,10 +173,12 @@ public class PlayTrackActivity extends AppCompatActivity {
     }
 
     private void setPlaybackImage(){
-        isPlayingAsync(isPlaying-> _binding.playTrack.setImageResource(isPlaying ? R.drawable.btn_pause : R.drawable.btn_play));
+        isPlayingAsync(isPlaying-> {
+                    _binding.playTrack.setImageResource(isPlaying ? R.drawable.pause_50 : R.drawable.play_50);
+                    _binding.playTrack.setBackgroundResource(android.R.color.transparent);
+                }
+        );
     }
-
-
 
 
     public class TrackProgressBar {

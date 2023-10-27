@@ -2,7 +2,6 @@ package com.app.spotifyapp.Fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.Navigation;
 
 import com.app.spotifyapp.R;
@@ -21,7 +19,6 @@ import com.spotify.protocol.types.Image;
 
 
 public class TrackCoverFragment extends Fragment {
-    // TODO: 8/2/2023 Try to do it without this fragment
 
     private FragmentTrackCoverBinding _binding;
     private float initialX;
@@ -48,13 +45,12 @@ public class TrackCoverFragment extends Fragment {
 
 
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->
-                requireActivity().runOnUiThread(() -> {
-                    _SpotifyAppRemote
+                requireActivity().runOnUiThread(() ->
+                        _SpotifyAppRemote
                             .getImagesApi()
                             .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
                             .setResultCallback(
-                                    bitmap -> _binding.trackImage.setImageBitmap(bitmap));
-                })
+                                    bitmap -> _binding.trackImage.setImageBitmap(bitmap)))
         ));
 
         _binding.trackImage.setOnTouchListener((v, event) -> {
@@ -67,7 +63,12 @@ public class TrackCoverFragment extends Fragment {
                     float deltaX = event.getX() - initialX;
 
                     if (deltaX > 400 || deltaX < -400) {
-                        Navigation.findNavController(requireView()).navigate(R.id.action_trackCoverFragment_to_lyricsFragment);
+                        try{
+
+                            Navigation.findNavController(requireView()).navigate(R.id.action_trackCoverFragment_to_lyricsFragment);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                     break;
             }

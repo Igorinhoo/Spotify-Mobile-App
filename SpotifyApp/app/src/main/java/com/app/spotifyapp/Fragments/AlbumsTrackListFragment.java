@@ -1,10 +1,7 @@
 package com.app.spotifyapp.Fragments;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +15,33 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.app.spotifyapp.Adapters.TracksRecyclerViewAdapter;
 import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
-import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.Repositories.ApiDataProvider;
-import com.app.spotifyapp.Repositories.PlaylistsAPIProvider;
-import com.app.spotifyapp.Services.AddPlaylistDialog;
 import com.app.spotifyapp.Services.AddToPlaylistDialog;
 import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentAlbumsTrackListBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class AlbumsTrackListFragment extends Fragment {
 
     private String img = "";
     private SpotifyAppRemote _SpotifyAppRemote;
-
     private FragmentAlbumsTrackListBinding _binding;
-    private String albumId;
+    private String albumId, releaseDate;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,24 +59,25 @@ public class AlbumsTrackListFragment extends Fragment {
             img = bundle.getString("albumImg");
             _binding.album.setText(bundle.getString("selectedAlbum"));
             albumId = bundle.getString("albumHref");
+            releaseDate = bundle.getString("albumReleaseDate");
+
             getTracks(albumId);
         }
     }
 
 
     public void getTracks(String Id){
-        final ArrayList<TrackDAO>[] trackData = new ArrayList[]{new ArrayList<>()} ;
+        final ArrayList<TrackDAO>[] trackData = new ArrayList[]{new ArrayList<>()};
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         _binding.trackListRecycler.setLayoutManager(linearLayoutManager);
         ArrayList<TrackDAO> finalTrackData = new ArrayList<>();
 
-        TracksRecyclerViewAdapter adapter = new TracksRecyclerViewAdapter(getActivity(), finalTrackData, new OnTrackClickListener() {
+        TracksRecyclerViewAdapter adapter = new TracksRecyclerViewAdapter(finalTrackData, new OnTrackClickListener() {
             @Override
             public void onItemClick(TrackDAO track, int position) {
                 if (_SpotifyAppRemote != null) {
-                    _SpotifyAppRemote.getPlayerApi().skipToIndex("spotify:album:"+ albumId, position);
-//                    _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
+                    _SpotifyAppRemote.getPlayerApi().skipToIndex("spotify:album:" + albumId, position);
                     Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
                     intent.putExtra("TrackHref", track.Id);
                     startActivity(intent);
@@ -86,20 +85,10 @@ public class AlbumsTrackListFragment extends Fragment {
             }
             @Override
             public void onLongClick(TrackDAO track) {
-                PlaylistsAPIProvider api = new PlaylistsAPIProvider(MainActivity.getAccessToken());
                 try {
-                    // TODO: 8/21/2023 Change that playlist that it will be saved to is selected from list
-//                    Dialog dialog = new Dialog(requireContext());
-//                    AddToPlaylistDialog addPlaylistDialog = new AddToPlaylistDialog(dialog, requireActivity());
-//                    addPlaylistDialog.DialogWork();
-//                    dialog.show();
-
                     DialogFragment dialog = new AddToPlaylistDialog(requireActivity(), track);
                     dialog.show(getParentFragmentManager(), "Add dialog");
-
-//                    api.AddToPlaylist(MainActivity.getAccessToken(), "7hnrA0Ngd2yNhRdHSWYklL", new String[]{"spotify:track:" + track.Id});
                     Toast.makeText(requireContext(), "Added " + track.Name , Toast.LENGTH_SHORT).show();
-                    Log.e("onLongClick: ", track.Name);
                 }catch (Exception e){
                     e.printStackTrace();
                     Toast.makeText(requireContext(), "Not added", Toast.LENGTH_SHORT).show();
@@ -111,11 +100,23 @@ public class AlbumsTrackListFragment extends Fragment {
 
         ApiDataProvider api = new ApiDataProvider();
         api.getAlbumTracks(Id, img, tracksData -> requireActivity().runOnUiThread(() -> {
-            _binding.tvAlbumLength.setText(GetAlbumLength(tracksData));
+            _binding.tvAlbumLength.setText(String.format("Time: %s min", GetAlbumLength(tracksData)));
             trackData[0].clear();
             trackData[0].addAll(tracksData);
             adapter.UpdateData(trackData[0]);
             adapter.notifyDataSetChanged();
+
+
+            try {
+                DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                DateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                Date date = inputFormat.parse(releaseDate);
+
+                String formattedDate = outputFormat.format(Objects.requireNonNull(date));
+                _binding.tvAlbumRelease.setText(formattedDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }));
 
     }

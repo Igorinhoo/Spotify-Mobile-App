@@ -1,10 +1,7 @@
 package com.app.spotifyapp.Fragments;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +14,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.app.spotifyapp.Adapters.AlbumsRecyclerViewAdapter;
-import com.app.spotifyapp.Genres.GenresActivity;
 import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.R;
@@ -37,10 +33,9 @@ public class PlaylistsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-
             api = new PlaylistsAPIProvider(MainActivity.getAccessToken());
         }catch (Exception e){
-            Log.e("EXCE", e.getMessage() );
+            Log.e("Trying to get Playlist Provider", e.getMessage() );
         }
     }
 
@@ -61,7 +56,7 @@ public class PlaylistsFragment extends Fragment {
             AddPlaylistDialog addPlaylistDialog = new AddPlaylistDialog(dialog);
             addPlaylistDialog.DialogWork(api);
             dialog.show();
-            Toast.makeText(requireContext(), "Adding...", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(requireContext(), "Adding...", Toast.LENGTH_SHORT).show();
         });
     }
     private void GetPlaylists(){
@@ -70,7 +65,7 @@ public class PlaylistsFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity());
         _binding.rvPlaylists.setLayoutManager(linearLayoutManager);
 
-        AlbumsRecyclerViewAdapter adapter = new AlbumsRecyclerViewAdapter(requireContext(), playlists, album -> {
+        AlbumsRecyclerViewAdapter adapter = new AlbumsRecyclerViewAdapter(playlists, album -> {
             Bundle bundle = new Bundle();
             bundle.putString("playlistID", album.getId());
             Navigation.findNavController(requireView()).navigate(R.id.action_playlists_to_playlistTrackListFragment, bundle);
@@ -79,21 +74,14 @@ public class PlaylistsFragment extends Fragment {
         });
         _binding.rvPlaylists.setAdapter(adapter);
 
-//        try {
-//            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                api.GetPlaylists(playlistData -> {
-                    requireActivity().runOnUiThread(() -> {
-                        playlists.clear();
-                        playlists.addAll(playlistData);
-                        adapter.UpdateData(playlistData);
-                        adapter.notifyDataSetChanged();
+        api.GetPlaylists(playlistData -> requireActivity().runOnUiThread(() -> {
+            playlists.clear();
+            playlists.addAll(playlistData);
+            adapter.UpdateData(playlistData);
+            adapter.notifyDataSetChanged();
 
-                    });
-                });
-//            }, 1000);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        }));
+
     }
 
     @Override

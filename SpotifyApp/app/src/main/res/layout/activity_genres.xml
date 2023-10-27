@@ -37,5 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textColor="@color/white"
-        android:text="Skip"/>
+        android:backgroundTint="#6E6E6E"
+        android:text="Skip"
+        />
 </LinearLayout>

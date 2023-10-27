@@ -3,19 +3,13 @@ package com.app.spotifyapp.Services;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,22 +36,21 @@ public class AddToPlaylistDialog extends DialogFragment {
 
         ArrayList<AlbumDAO> playlists = new ArrayList<>();
 
-        adapter = new AlbumsRecyclerViewAdapter(context, playlists, playlist -> {
+        adapter = new AlbumsRecyclerViewAdapter(playlists, playlist -> {
             api.AddToPlaylist(MainActivity.getAccessToken(), playlist.getId(), new String[]{"spotify:track:" + this.track.Id});
             dismiss();
         });
 
-        api.GetPlaylists(playlistData -> {
-            context.runOnUiThread(() -> {
-                playlists.clear();
-                playlists.addAll(playlistData);
-                adapter.UpdateData(playlistData);
-                adapter.notifyDataSetChanged();
+        api.GetPlaylists(playlistData -> context.runOnUiThread(() -> {
+            playlists.clear();
+            playlists.addAll(playlistData);
+            adapter.UpdateData(playlistData);
+            adapter.notifyDataSetChanged();
 
-            });
-        });
+        }));
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());

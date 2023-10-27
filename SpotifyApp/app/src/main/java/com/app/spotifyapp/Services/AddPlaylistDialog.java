@@ -1,7 +1,6 @@
 package com.app.spotifyapp.Services;
 
 import android.app.Dialog;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 
@@ -9,7 +8,6 @@ import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.TrackDAO;
 import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.PlaylistsAPIProvider;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class AddPlaylistDialog {
 

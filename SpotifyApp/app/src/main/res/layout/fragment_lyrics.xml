@@ -13,21 +13,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
         <Button
             android:id="@+id/btnToFloating"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Go to floating mode"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E" />
 
-    <TextView
-        android:id="@+id/songLyrics"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lyrics of the song..."
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:maxLines="300"
-        />
+        <TextView
+            android:id="@+id/songLyrics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lyrics of the song..."
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:maxLines="300"
+            />
     </LinearLayout>
 
 </ScrollView>

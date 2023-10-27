@@ -9,9 +9,11 @@ public class AlbumDAO {
         return name;
     }
 
-    public String getId() {
-        return id;
+    @Nullable
+    public String getReleaseDate() {
+        return releaseDate;
     }
+    public String getId() {return id;}
 
     public Url[] getImages() {
         return images;
@@ -24,7 +26,9 @@ public class AlbumDAO {
     @SerializedName("images")
     private Url[] images;
 
-
+    @Nullable
+    @SerializedName("release_date")
+    private String releaseDate;
     @Nullable
     @SerializedName("snapshot_id")
     public String SnapshotID;
@@ -46,14 +50,4 @@ public class AlbumDAO {
         this.images = new Url[]{url};
         this.SnapshotID = SnapshotID;
     }
-//
-//    public final String Name;
-//    public final String Id;
-//    public final String Img;
-//    public AlbumDAO(String Name, String Id, String Img, @Nullable String SnapshotID) {
-//        this.name = Name;
-//        this.id = Id;
-//        this.Img = Img;
-//        this.SnapshotID = SnapshotID;
-//    }
 }

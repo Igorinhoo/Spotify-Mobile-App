@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="25dp"
-    android:background="#FA0"
+    android:background="@color/basicListview"
     android:orientation="vertical">
 
     <TextView
@@ -19,12 +19,16 @@
         android:id="@+id/playlistName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name"/>
+        android:hint="Name"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"/>
     <EditText
         android:id="@+id/playlistDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description"/>
+        android:hint="Description"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,7 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="Make playlist public"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:textColor="@color/white"/>
         <Switch
             android:id="@+id/playlistPublic"
             android:layout_width="wrap_content"
@@ -55,13 +60,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:text="Add"/>
+            android:text="Add"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"/>
         <Button
             android:id="@+id/addingCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="Cancel"/>
+            android:text="Cancel"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"/>
     </RelativeLayout>
 
 

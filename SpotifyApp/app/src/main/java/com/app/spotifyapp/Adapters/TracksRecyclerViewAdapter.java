@@ -1,6 +1,5 @@
 package com.app.spotifyapp.Adapters;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -23,10 +22,9 @@ import java.util.concurrent.TimeUnit;
 public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecyclerViewAdapter.ViewHolder>{
 
     private ArrayList<TrackDAO> data;
-
     private final OnTrackClickListener _listener;
 
-    public TracksRecyclerViewAdapter(Context context, ArrayList<TrackDAO> data, OnTrackClickListener listener){
+    public TracksRecyclerViewAdapter(ArrayList<TrackDAO> data, OnTrackClickListener listener){
         this.data = data;
         this._listener = listener;
     }
@@ -86,9 +84,6 @@ public class TracksRecyclerViewAdapter extends RecyclerView.Adapter<TracksRecycl
     public int getItemCount() {
         return data.size();
     }
-
-
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private final TextView name, duration;

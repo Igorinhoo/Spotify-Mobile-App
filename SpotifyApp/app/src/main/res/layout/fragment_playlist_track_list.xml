@@ -15,7 +15,9 @@
             android:id="@+id/btnPlayPlaylist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/play_circle"/>
+            android:src="@drawable/play_circle"
+            android:background="@android:color/transparent"
+            android:padding="15dp"/>
 
     </LinearLayout>
 

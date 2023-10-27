@@ -15,17 +15,17 @@
         android:layout_height="match_parent"
         android:paddingVertical="10dp"
         android:orientation="vertical"
-        android:background="#676A6A">
+        android:background="@color/basicListview">
 
         <ImageView
-            android:id="@+id/idIVcourse"
+            android:id="@+id/ivArtistImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
              />
 
         <TextView
-            android:id="@+id/idTVCourse"
+            android:id="@+id/tvArtistName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center" />

@@ -8,15 +8,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -30,6 +27,8 @@ public class FloatingWindowService extends Service implements LyricsProvider.Lyr
     private WindowManager windowManager;
     private View floatingWindowView;
     private TextView text;
+    private int scrollPosition = 0;
+
     private static final int FOREGROUND_NOTIFICATION_ID = 1;
 
     @Override
@@ -47,7 +46,7 @@ public class FloatingWindowService extends Service implements LyricsProvider.Lyr
         SpotifyAppRemote _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState -> {
             LyricsProvider lyrics = LyricsProvider.GetInstance();
-            lyrics.getLyrics(playerState.track.artist.name, playerState.track.name, this);
+            lyrics.GetLyrics(playerState.track.artist.name, playerState.track.name, this);
             }
         ));
 
@@ -89,7 +88,11 @@ public class FloatingWindowService extends Service implements LyricsProvider.Lyr
                         return true;
                     default:
                         return false;
+
+
+
                 }
+
             }
 
 
@@ -101,15 +104,13 @@ public class FloatingWindowService extends Service implements LyricsProvider.Lyr
         });
 
 
-        floatingWindowView.findViewById(R.id.btnCloseFloating).setOnClickListener(view -> {
-            stopService(intent);
-            // TODO: 8/23/2023 Mayby this: 
-//            stopSelf();
-        });
+        floatingWindowView.findViewById(R.id.btnCloseFloating).setOnClickListener(view -> stopSelf());
 
         floatingWindowView.findViewById(R.id.btnFloatingUp).setOnClickListener(view -> {
-            scrollPosition -= 20;
-            text.scrollTo(0, scrollPosition);
+            if (scrollPosition > 0){
+                scrollPosition -= 20;
+                text.scrollTo(0, scrollPosition);
+            }
         });
 
         floatingWindowView.findViewById(R.id.btnFloatingDown).setOnClickListener(view -> {
@@ -122,11 +123,10 @@ public class FloatingWindowService extends Service implements LyricsProvider.Lyr
         return START_STICKY;
     }
 
-    private int scrollPosition = 0;
     private Notification buildForegroundNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL")
-                .setContentTitle("Floating Window Service")
-                .setContentText("Floating window is active")
+                .setContentTitle("Floating Lyrics")
+                .setContentText("Floating lyrics window is active")
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 

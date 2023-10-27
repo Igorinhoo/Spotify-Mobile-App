@@ -10,7 +10,6 @@ public class Url {
         this.url = Url;
     }
 
-
     @SerializedName("url")
     private String url;
 

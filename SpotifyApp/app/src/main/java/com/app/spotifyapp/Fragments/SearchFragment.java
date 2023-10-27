@@ -58,31 +58,27 @@ public class SearchFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity());
         _binding.rvSearch.setLayoutManager(linearLayoutManager);
 
-        SearchRecyclerViewAdapter adapter = new SearchRecyclerViewAdapter(requireContext(), searchData, this::ManageOnSearchClick);
+        SearchRecyclerViewAdapter adapter = new SearchRecyclerViewAdapter(searchData, this::ManageOnSearchClick);
         _binding.rvSearch.setAdapter(adapter);
 
-        _binding.btnSearchArtists.setOnClickListener(view -> {
-            ManageOnTextViewClick("artist");
-        });
+        _binding.btnSearchArtists.setOnClickListener(view -> ManageOnTextViewClick("artist"));
 
-        _binding.btnSearchAlbums.setOnClickListener(view -> {
-            ManageOnTextViewClick("album");
-        });
-        _binding.btnSearchTracks.setOnClickListener(view -> {
-            ManageOnTextViewClick("track");
-        });
+        _binding.btnSearchAlbums.setOnClickListener(view -> ManageOnTextViewClick("album"));
+        _binding.btnSearchTracks.setOnClickListener(view -> ManageOnTextViewClick("track"));
 
         _binding.btnSearch.setOnClickListener(view -> {
             InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             Objects.requireNonNull(inputMethodManager).hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
-
-            if (isAnythingClicked()){
-                api.Search(_binding.etSearch.getText().toString(), searchTypes, requireActivity(), data -> {
-                    searchData.clear();
-                    searchData.addAll(data);
-                    adapter.UpdateData(searchData);
-                    adapter.notifyDataSetChanged();
-                });
+            String input = _binding.etSearch.getText().toString();
+            if (!input.isEmpty()){
+                if (isAnythingClicked()){
+                    api.Search(input, searchTypes, requireActivity(), data -> {
+                        searchData.clear();
+                        searchData.addAll(data);
+                        adapter.UpdateData(searchData);
+                        adapter.notifyDataSetChanged();
+                    });
+                }
             }
 
         });
@@ -104,13 +100,6 @@ public class SearchFragment extends Fragment {
         BackgroundOnRestart();
     }
 
-//    private void setSearchType(String type){
-//        if (searchType != null && searchType.equals(type)){
-//            searchType = null;
-//            return;
-//        }
-//        searchType = type;
-//    }
 
     // TODO: 8/1/2023 Temporary function to check if any type of search is checked 
     private boolean isAnythingClicked(){
@@ -170,9 +159,10 @@ public class SearchFragment extends Fragment {
             bundle.putString("selectedAlbum", search.Name);
             bundle.putString("albumHref", search.Id);
             bundle.putString("albumImg", search.Img);
+            bundle.putString("albumReleaseDate", search.ReleaseDate);
             Navigation.findNavController(requireView()).navigate(R.id.action_search_to_albumsTrackList, bundle);
         }else{
-            bundle.putString("artistUri", search.Id);
+            bundle.putString("artistID", search.Id);
             bundle.putString("artistName", search.Name);
             bundle.putString("artistImg", search.Img);
             Navigation.findNavController(requireView()).navigate(R.id.action_search_to_ArtistsAlbumsFragment, bundle);
