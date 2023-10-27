@@ -1,31 +1,30 @@
 package com.app.spotifyapp.Fragments;
 
-import android.content.Intent;
+import static android.content.Context.MODE_PRIVATE;
+
+import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.app.spotifyapp.Adapters.TopArtistsRecyclerViewAdapter;
 import com.app.spotifyapp.Adapters.TopTracksRecyclerViewAdapter;
-import com.app.spotifyapp.Interfaces.Listeners.OnTrackClickListener;
 import com.app.spotifyapp.MainActivity;
 import com.app.spotifyapp.Models.ArtistDAO;
+import com.app.spotifyapp.Models.StatisticsTerm;
 import com.app.spotifyapp.Models.TrackDAO;
-import com.app.spotifyapp.PlayTrackActivity;
 import com.app.spotifyapp.R;
 import com.app.spotifyapp.Repositories.StatisticsAPIDataProvider;
-import com.app.spotifyapp.Services.SpotifyAppRemoteConnector;
 import com.app.spotifyapp.databinding.FragmentStatisticsBinding;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import java.util.ArrayList;
 
@@ -34,25 +33,19 @@ public class StatisticsFragment extends Fragment{
 
     private final ArrayList<ArtistDAO> ArtistData = new ArrayList<>();
     private final ArrayList<TrackDAO> TrackData = new ArrayList<>();
-    private SpotifyAppRemote _SpotifyAppRemote;
-
     private FragmentStatisticsBinding _binding;
+    private static final LinearLayout.LayoutParams weight1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
+    private static final LinearLayout.LayoutParams weight0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0, 0);
+    private TopArtistsRecyclerViewAdapter adapterArtists;
+    private TopTracksRecyclerViewAdapter adapterTracks;
     private StatisticsAPIDataProvider api;
-    private static final LinearLayout.LayoutParams weigth1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
-    private static final LinearLayout.LayoutParams weigth0 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0, 0);
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         api = new StatisticsAPIDataProvider();
-        weigth0.setMargins(8,8,8,8);
-        weigth1.setMargins(8,8,8,8);
-
-        api.getTopTracks(MainActivity.getAccessToken(), trackData -> requireActivity().runOnUiThread(() -> TrackData.addAll(trackData)));
-        api.getTopArtists(MainActivity.getAccessToken() , artistsData -> requireActivity().runOnUiThread(() -> ArtistData.addAll(artistsData)));
-        _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
+        weight0.setMargins(8,8,8,8);
+        weight1.setMargins(8,8,8,8);
 
     }
 
@@ -60,55 +53,99 @@ public class StatisticsFragment extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         _binding = FragmentStatisticsBinding.inflate(inflater, container, false);
+
+        _binding.topTracksRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
+        _binding.topAlbumsRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
+
+        adapterArtists = new TopArtistsRecyclerViewAdapter(ArtistData);
+        _binding.topAlbumsRecycler.setAdapter(adapterArtists);
+
+        adapterTracks = new TopTracksRecyclerViewAdapter(requireActivity(), TrackData);
+        _binding.topTracksRecycler.setAdapter(adapterTracks);
+
+        GetStatistics();
+
         return _binding.getRoot();
     }
 
+    private void GetStatistics(){
+        int value = requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getInt("statsTerm", 2);
+        StatisticsTerm term = StatisticsTerm.LONG_TERM;
+        switch (value){
+            case 0:
+                term = StatisticsTerm.SHORT_TERM;
+                break;
+            case 1:
+                term = StatisticsTerm.MEDIUM_TERM;
+                break;
+        }
+
+        api.getTopTracks(MainActivity.getAccessToken(), term, trackData -> requireActivity().runOnUiThread(() -> {
+            TrackData.clear();
+            TrackData.addAll(trackData);
+            adapterTracks.UpdateData(TrackData);
+            adapterTracks.notifyDataSetChanged();
+            _binding.topAlbumsRecycler.scrollToPosition(0);
+        }));
+        api.getTopArtists(MainActivity.getAccessToken(), term, artistsData -> requireActivity().runOnUiThread(() -> {
+            ArtistData.clear();
+            ArtistData.addAll(artistsData);
+            adapterArtists.UpdateData(ArtistData);
+            adapterArtists.notifyDataSetChanged();
+            _binding.topTracksRecycler.scrollToPosition(0);
+        }));
+    }
+
+    private void ShowTermDialog(){
+        Dialog dialog = new Dialog(requireContext(), R.style.CustomButtonsDialog);
+        dialog.setContentView(R.layout.statistics_choice);
+
+        Button short_term = dialog.findViewById(R.id.btn_short_term);
+        Button medium_term = dialog.findViewById(R.id.btn_medium_term);
+        Button long_term = dialog.findViewById(R.id.btn_long_term);
+
+        short_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
+        medium_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
+        long_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
+
+        short_term.setOnClickListener(view -> {
+            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                    .edit().putInt("statsTerm", 0).apply();
+            GetStatistics();
+            dialog.dismiss();
+        });
+        medium_term.setOnClickListener(view -> {
+            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                    .edit().putInt("statsTerm", 1).apply();
+            GetStatistics();
+            dialog.dismiss();
+        });
+        long_term.setOnClickListener(view -> {
+            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                    .edit().putInt("statsTerm", 2).apply();
+            GetStatistics();
+            dialog.dismiss();
+        });
+        dialog.show();
+    }
     @Override
     public void onStart() {
         super.onStart();
 
-//        api.getQUEUE(MainActivity.getAccessToken());
+        _binding.btnStatisticsSettings.setOnClickListener(view -> ShowTermDialog());
 
         _binding.tracks.setOnClickListener((view -> {
-            _binding.topItemsRecycler.setLayoutParams(weigth0);
-            _binding.topTracksRecycler.setLayoutParams(weigth1);
+            _binding.topAlbumsRecycler.setLayoutParams(weight0);
+            _binding.topTracksRecycler.setLayoutParams(weight1);
 
-            _binding.topTracksRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
-            TopTracksRecyclerViewAdapter adapter = new TopTracksRecyclerViewAdapter(getActivity(), TrackData, new OnTrackClickListener() {
-                @Override
-                public void onItemClick(TrackDAO track) {
-                    Log.e("onItemClick: ", track.Name);
-                    if (_SpotifyAppRemote != null) {
-                        _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
-                        Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                        intent.putExtra("TrackHref", track.Id);
-                        startActivity(intent);
-                    }
-                }
-
-                @Override
-                public void onLongClick(TrackDAO track) {
-
-                }
-            });
-            _binding.topTracksRecycler.setAdapter(adapter);
         }));
 
 
         _binding.artists.setOnClickListener(view -> {
-            _binding.topItemsRecycler.setLayoutParams(weigth1);
-            _binding.topTracksRecycler.setLayoutParams(weigth0);
+            _binding.topAlbumsRecycler.setLayoutParams(weight1);
+            _binding.topTracksRecycler.setLayoutParams(weight0);
 
-            _binding.topItemsRecycler.setLayoutManager(new LinearLayoutManager(requireActivity()));
-            TopArtistsRecyclerViewAdapter adapter = new TopArtistsRecyclerViewAdapter(getActivity(), ArtistData, artist -> {
-                Bundle bundle = new Bundle();
-                bundle.putString("artistUri", artist.Id);
-                bundle.putString("artistName", artist.Name);
-                bundle.putString("artistImg", artist.Img);
-
-                Navigation.findNavController(requireView()).navigate(R.id.action_statistics_to_artistAlbumsFragment, bundle);
-            });
-            _binding.topItemsRecycler.setAdapter(adapter);
         });
     }
 

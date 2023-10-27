@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ArtistsFragment extends Fragment {
 
     private FragmentArtistsBinding _binding;
-    private final ArrayList<ArtistDAO>[] artistsDatas = new ArrayList[]{new ArrayList<>()};
+    private final ArrayList<ArtistDAO>[] artistsData = new ArrayList[]{new ArrayList<>()};
     private ArtistsGridViewAdapter adapter;
     private FirebaseRepo db;
     @Override
@@ -35,34 +35,31 @@ public class ArtistsFragment extends Fragment {
         db.setRef();
 
 
-        ArrayList<ArtistDAO> finalArtistsData = artistsDatas[0];
+        ArrayList<ArtistDAO> finalArtistsData = artistsData[0];
 
         adapter = new ArtistsGridViewAdapter(requireActivity(), finalArtistsData);
         adapter.setOnArtistClickListener(artist -> {
             Bundle bundle = new Bundle();
-            bundle.putString("artistUri", artist.Id);
+            bundle.putString("artistID", artist.Id);
             bundle.putString("artistName", artist.Name);
             bundle.putString("artistImg", artist.Img);
             Navigation.findNavController(requireView()).navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
         });
 
-        adapter.setOnArtistLongClickListener(artist -> {
-            requireActivity().runOnUiThread(()->{
-                Toast.makeText(requireContext(), "Deleting " + artist.Name, Toast.LENGTH_SHORT).show();
-                db.Delete(artist);
-                artistsDatas[0].remove(artist);
-                adapter.UpdateData(artistsDatas[0]);
-                adapter.notifyDataSetChanged();
-            });
-
-        });
+        adapter.setOnArtistLongClickListener(artist -> requireActivity().runOnUiThread(()->{
+            Toast.makeText(requireContext(), "Deleting " + artist.Name, Toast.LENGTH_SHORT).show();
+            db.Delete(artist);
+            artistsData[0].remove(artist);
+            adapter.UpdateData(artistsData[0]);
+            adapter.notifyDataSetChanged();
+        }));
 
         _binding.gvArtists.setAdapter(adapter);
 
-        db.SelectYours(artistsData -> {
-            artistsDatas[0].clear();
-            artistsDatas[0].addAll(artistsData);
-            adapter.UpdateData(artistsData);
+        db.SelectYours(artists_data -> {
+            artistsData[0].clear();
+            artistsData[0].addAll(artists_data);
+            adapter.UpdateData(artists_data);
             adapter.notifyDataSetChanged();
         });
 
@@ -72,12 +69,6 @@ public class ArtistsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        _binding.delete.setOnClickListener(v ->{
-            db.dele();
-            artistsDatas[0].clear();
-            adapter.UpdateData(artistsDatas[0]);
-            adapter.notifyDataSetChanged();
-        });
     }
 
 

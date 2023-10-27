@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -16,13 +19,19 @@
         android:theme="@style/Theme.SpotifyApp"
         tools:targetApi="31">
         <activity
+            android:name=".Games.GamesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SpotifyApp.NoActionBar" />
+
+        <service
+            android:name=".Services.FloatingWindowService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
             android:name=".Genres.GenresActivity"
             android:exported="false"
-            android:theme="@style/Theme.SpotifyApp.NoActionBar"/>
-        <activity
-            android:name=".FloatingActivity"
-            android:exported="false"
-            android:theme="@style/Theme.SpotifyApp.NoActionBar"/>
+            android:theme="@style/Theme.SpotifyApp.NoActionBar" />
         <activity
             android:name=".PlayTrackActivity"
             android:exported="false"

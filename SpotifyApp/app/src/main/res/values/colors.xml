@@ -9,5 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="basic">#676A6A</color>
     <color name="touched">#9A9A9A</color>
+    <color name="basicListview">#2B2B2B</color>
+    <color name="buttons">#191919</color>
+
 
 </resources>

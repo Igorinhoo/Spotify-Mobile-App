@@ -4,13 +4,16 @@ package com.app.spotifyapp.Repositories;
 import android.app.Dialog;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.app.spotifyapp.Interfaces.APIProviders.PlaylistsAPI;
 import com.app.spotifyapp.Interfaces.Callbacks.AlbumDataCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.SingleAlbumCallback;
+import com.app.spotifyapp.Interfaces.Callbacks.StringCallback;
 import com.app.spotifyapp.Interfaces.Callbacks.TrackDataCallback;
 import com.app.spotifyapp.Models.AlbumDAO;
 import com.app.spotifyapp.Models.TrackDAO;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,13 +47,13 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
-                    JSONObject json = new JSONObject(response.body().string());
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
 //                    Log.e("ID", json.getString("id"));
                     USER_ID = json.getString("id");
                 } catch (Exception e) {
@@ -59,7 +62,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -84,7 +87,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
@@ -92,16 +95,56 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 try {
 
 
-                    JSONObject json = new JSONObject(response.body().string());
-                    Log.e("ID", json.getString("id"));
-
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
+                    Log.e("ID", "Created playlist with id: " + json.getString("id"));
                 } catch (Exception e) {
                     Log.e("Call Create Playlists", e.getMessage());
                 }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            }
+        });
+    }
+
+
+    public void CreatePlaylist(String Name, String Description, boolean Public, StringCallback callback) {
+        JSONObject playlistData = new JSONObject();
+
+        try {
+            playlistData.put("name", Name);
+            playlistData.put("description", Description);
+            playlistData.put("public", Public);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), playlistData.toString());
+        Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/users/" + USER_ID + "/playlists")
+                .header("Authorization", "Bearer " + AccessToken)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
+                    return;
+                }
+                try {
+
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
+                    Log.e("ID", json.getString("id"));
+                    callback.onStringReceived(json.getString("id"));
+                } catch (Exception e) {
+                    Log.e("Call Create Playlists", e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -114,7 +157,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
@@ -122,14 +165,15 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 try {
                     ArrayList<AlbumDAO> playlists = new ArrayList<>();
 
-                    JSONObject json = new JSONObject(response.body().string());
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
                     JSONArray items = json.getJSONArray("items");
                     for(int i = 0; i< items.length(); i++){
-                        JSONObject albumJson = items.getJSONObject(i);
-                        AlbumDAO playlist = new AlbumDAO(albumJson.getString("name"), albumJson.getString("id"),
-                                albumJson.getJSONArray("images").getJSONObject(0).getString("url"), albumJson.getString("snapshot_id"));
-                        playlists.add(playlist);
-//                        Log.e( "onResponse: ", playlist.SnapshotID);
+                        Gson gson = new Gson();
+                        AlbumDAO playlistResponse = gson.fromJson(items.getJSONObject(i).toString(), AlbumDAO.class);
+
+//                        AlbumDAO playlist = new AlbumDAO(albumJson.getString("name"), albumJson.getString("id"),
+//                                albumJson.getJSONArray("images").getJSONObject(0).getString("url"), albumJson.getString("snapshot_id"));
+                        playlists.add(playlistResponse);
                     }
                     callback.onAlbumDataReceived(playlists);
                 } catch (Exception e) {
@@ -138,7 +182,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -151,24 +195,28 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
+                    Gson gson = new Gson();
+                    AlbumDAO albumResponse = gson.fromJson(Objects.requireNonNull(response.body()).string(), AlbumDAO.class);
 
-                    JSONObject json = new JSONObject(response.body().string());
-                    AlbumDAO playlist = new AlbumDAO(json.getString("name"), json.getString("id"), json.getJSONArray("images").getJSONObject(0).getString("url"),
-                            json.getString("snapshot_id"));
-                    callback.onAlbumDataReceived(playlist);
+//                    JSONObject json = new JSONObject(response.body().string());
+//                    AlbumDAO playlist = new AlbumDAO(json.getString("name"), json.getString("id"), json.getJSONArray("images").getJSONObject(0).getString("url"),
+//                            json.getString("snapshot_id"));
+//                    Log.e("onResponse: ", );
+
+                    callback.onAlbumDataReceived(albumResponse);
                 } catch (Exception e) {
                     Log.e("Call Get Playlist", e.getMessage());
                 }
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -181,14 +229,14 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
                     ArrayList<TrackDAO> tracks = new ArrayList<>();
-                    JSONObject json = new JSONObject(response.body().string());
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
                     JSONArray items = json.getJSONArray("items");
                     for(int i = 0; i< items.length(); i++){
                         JSONObject playlist = items.getJSONObject(i);
@@ -206,7 +254,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -234,16 +282,13 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
-
-
-                    JSONObject json = new JSONObject(response.body().string());
-//                    Log.e("ID", json.getString("id"));
+                    JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
 
                 } catch (Exception e) {
                     Log.e("Call Create Playlists", e.getMessage());
@@ -251,7 +296,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -270,8 +315,6 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.e("RemoveFromPlaylist: ", tracksArray.toString());
-        Log.e("RemoveFromPlaylistID: ", snapshotID);
         try {
             playlistData.put("tracks", tracksArray);
             playlistData.put("snapshot_id", snapshotID);
@@ -290,13 +333,12 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
 
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.e("DAMAGE Handler", "API request failed with code " + response.code() + ": " + Objects.requireNonNull(response.body()).string());
                     return;
                 }
                 try {
-                    JSONObject json = new JSONObject(response.body().string());
                     dialog.dismiss();
                 } catch (Exception e) {
                     Log.e("Call Create Playlists", e.getMessage());
@@ -304,7 +346,7 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
             }
 
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         });
     }
@@ -312,56 +354,27 @@ public class PlaylistsAPIProvider implements PlaylistsAPI {
 
 
 
-/*class QUEUE{
-//    public Object currently_playing;
-    @SerializedName("queue")
 
-    public Queue[] queue;
-}
-class Queue{
-    public Album album;
-    @SerializedName("name")
-    public String names;
-}
+//class Album {
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public String getId() {
+//        return id;
+//    }
+//
+//    public Url[] getImages() {
+//        return images;
+//    }
+//
+//    @SerializedName("name")
+//    private String name;
+//    @SerializedName("id")
+//    private String id;
+//    @SerializedName("images")
+//    private Url[] images;
+//
+//
+//}
 
-class Album{
-
-}
-*/
-
-class QueueResponse {
-    @SerializedName("queue")
-    private QueueItem[] queueItems;
-
-    public QueueItem[] getQueueItems() {
-        return queueItems;
-    }
-}
-
-class QueueItem {
-    @SerializedName("name")
-    private String track;
-
-    public String getTrack() {
-        return track;
-    }
-}
-/*
-
-class CurrentlyPlaying {
-    private Track currently_playing;
-
-    public Track getCurrentlyPlaying() {
-        return currently_playing;
-    }
-}
-*/
-
-
-class Track {
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-}

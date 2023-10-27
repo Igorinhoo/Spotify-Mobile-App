@@ -1,10 +1,8 @@
 package com.app.spotifyapp.Adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 
 import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
 import com.app.spotifyapp.Models.ArtistDAO;
@@ -50,33 +46,33 @@ public class ArtistsGridViewAdapter extends ArrayAdapter<ArtistDAO> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        View listitemView = convertView;
-        if (listitemView == null) {
-            listitemView = LayoutInflater.from(getContext()).inflate(R.layout.gridmodel, parent, false);
+        View itemView = convertView;
+        if (itemView == null) {
+            itemView = LayoutInflater.from(getContext()).inflate(R.layout.gridmodel, parent, false);
         }
-        ArtistDAO courseModel = null;
+        ArtistDAO artistModel = null;
         if (data != null) {
-            courseModel = data.get(position);
+            artistModel = data.get(position);
         }
-        TextView courseTV = listitemView.findViewById(R.id.idTVCourse);
-        ImageView courseIV = listitemView.findViewById(R.id.idIVcourse);
+        TextView artistName = itemView.findViewById(R.id.tvArtistName);
+        ImageView artistImage = itemView.findViewById(R.id.ivArtistImage);
 
-        ArtistDAO finalCourseModel = courseModel;
-        listitemView.setOnClickListener(v -> {
+        ArtistDAO finalArtistModel = artistModel;
+        itemView.setOnClickListener(v -> {
             if (artistClickListener != null) {
-                artistClickListener.onItemClick(finalCourseModel);
+                artistClickListener.onItemClick(finalArtistModel);
             }
         });
 
-        LinearLayout llBackground = listitemView.findViewById(R.id.cardViewLinear);
-        listitemView.setOnLongClickListener(new View.OnLongClickListener() {
+        LinearLayout llBackground = itemView.findViewById(R.id.cardViewLinear);
+        itemView.setOnLongClickListener(new View.OnLongClickListener() {
             private final Handler longClickHandler = new Handler(Looper.getMainLooper());
             @Override
             public boolean onLongClick(View view) {
                 llBackground.setBackgroundResource(R.color.touched);
                 longClickHandler.postDelayed(() -> {
                     if (artistLongClickListener != null) {
-                        artistLongClickListener.onItemClick(finalCourseModel);
+                        artistLongClickListener.onItemClick(finalArtistModel);
                         llBackground.setBackgroundResource(R.color.basic);
                     }
                 }, 1000);
@@ -85,11 +81,10 @@ public class ArtistsGridViewAdapter extends ArrayAdapter<ArtistDAO> {
         });
 
 
-        if (courseModel != null) {
-
-            courseTV.setText(courseModel.Name);
-            Picasso.get().load(courseModel.Img).into(courseIV);
+        if (artistModel != null) {
+            artistName.setText(artistModel.Name);
+            Picasso.get().load(artistModel.Img).into(artistImage);
         }
-        return listitemView;
+        return itemView;
     }
 }

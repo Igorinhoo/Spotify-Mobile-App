@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/music_navigation"
         android:icon="@drawable/home"
@@ -11,14 +12,12 @@
         />
     <item
         android:id="@+id/statistics"
-        android:icon="@drawable/statistics"
+        android:icon="@drawable/statistics_selector"
         android:title="Statistics"/>
     <item
         android:id="@+id/playlists"
-        android:icon="@drawable/playlist"
+        android:icon="@drawable/playlists_selector"
         android:title="Playlists"
         />
-
-
 
 </menu>

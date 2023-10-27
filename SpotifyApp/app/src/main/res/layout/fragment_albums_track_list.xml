@@ -30,13 +30,29 @@
             android:layout_marginBottom="8dp"
             tools:listitem="@layout/tracklistview" />
 
-        <TextView
-            android:id="@+id/tvAlbumLength"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            />
-    </LinearLayout>
+       <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:padding="5dp">
+
+            <TextView
+                android:id="@+id/tvAlbumLength"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_alignParentStart="true"
+                />
+           <TextView
+               android:id="@+id/tvAlbumRelease"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textSize="15sp"
+               android:textColor="@color/white"
+               android:textStyle="bold"
+               android:layout_alignParentEnd="true"/>
+       </RelativeLayout>
+
+   </LinearLayout>
 </androidx.core.widget.NestedScrollView>

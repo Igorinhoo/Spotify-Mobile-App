@@ -19,16 +19,13 @@ import com.spotify.protocol.types.Image;
 
 
 public class TrackCoverFragment extends Fragment {
-    // TODO: 8/2/2023 Try to do it without this fragment
 
     private FragmentTrackCoverBinding _binding;
-    private SpotifyAppRemote _SpotifyAppRemote;
     private float initialX;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
     }
 
     @Override
@@ -43,21 +40,18 @@ public class TrackCoverFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        final SpotifyAppRemote _SpotifyAppRemote = SpotifyAppRemoteConnector.GetAppRemote();
+
+
+
         _SpotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback((playerState ->
-                requireActivity().runOnUiThread(() -> {
-                    _SpotifyAppRemote
+                requireActivity().runOnUiThread(() ->
+                        _SpotifyAppRemote
                             .getImagesApi()
                             .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
                             .setResultCallback(
-                                    bitmap -> _binding.trackImage.setImageBitmap(bitmap));
-                })
+                                    bitmap -> _binding.trackImage.setImageBitmap(bitmap)))
         ));
-
-//        _binding.trackImage.setOnLongClickListener(view ->{
-//            Navigation.findNavController(requireView()).navigate(R.id.action_trackCoverFragment_to_lyricsFragment);
-//            return true;
-//        });
-
 
         _binding.trackImage.setOnTouchListener((v, event) -> {
             int action = event.getAction();
@@ -69,7 +63,12 @@ public class TrackCoverFragment extends Fragment {
                     float deltaX = event.getX() - initialX;
 
                     if (deltaX > 400 || deltaX < -400) {
-                        Navigation.findNavController(requireView()).navigate(R.id.action_trackCoverFragment_to_lyricsFragment);
+                        try{
+
+                            Navigation.findNavController(requireView()).navigate(R.id.action_trackCoverFragment_to_lyricsFragment);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                     break;
             }

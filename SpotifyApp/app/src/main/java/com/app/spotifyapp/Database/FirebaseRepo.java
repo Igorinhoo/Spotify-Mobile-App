@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FirebaseRepo {
+
+    // TODO: 8/23/2023 Change rules in database to be to different identity 
     private static FirebaseRepo instance;
     private DatabaseReference myRef;
     private static FirebaseDatabase database;
@@ -97,7 +99,7 @@ public class FirebaseRepo {
             myRef.child("YourArtists").child(artist.Id).removeValue();
         }
     }
-    public void dele(){
+    public void DeleteAllUserArtists(){
         myRef.child("YourArtists").removeValue();
     }
 }

@@ -1,6 +1,5 @@
 package com.app.spotifyapp.Adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +17,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecyclerViewAdapter.ViewHolder>{
-    private Context context;
     private ArrayList<AlbumDAO> data;
 
-    private OnAlbumClickListener _listener;
+    private final OnAlbumClickListener _listener;
 
-    public AlbumsRecyclerViewAdapter(Context context, ArrayList<AlbumDAO> data, OnAlbumClickListener listener){
-        this.context = context;
+    public AlbumsRecyclerViewAdapter(ArrayList<AlbumDAO> data, OnAlbumClickListener listener){
         this.data = data;
         this._listener = listener;
     }
@@ -52,8 +49,15 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
             }
         });
 
-        holder.name.setText(data.get(position).Name);
-        Picasso.get().load(data.get(position).Img).into(holder.image);
+        holder.name.setText(data.get(position).getName());
+        String img;
+        try{
+            img = data.get(position).getImages()[0].getUrl();
+        }catch (Exception e){
+            img = "https://tinyurl.com/2p8pzm3e";
+        }
+
+        Picasso.get().load(img).into(holder.image);
     }
     @Override
     public int getItemCount() {
@@ -64,10 +68,10 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView name;
-        private ImageView image;
-        private OnAlbumClickListener _listener;
-        private ArrayList<AlbumDAO> _data;
+        private final TextView name;
+        private final ImageView image;
+        private final OnAlbumClickListener _listener;
+        private final ArrayList<AlbumDAO> _data;
 
         public ViewHolder(@NonNull View itemView, OnAlbumClickListener listener, ArrayList<AlbumDAO> data) {
             super(itemView);

@@ -1,6 +1,5 @@
 package com.app.spotifyapp.Adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.app.spotifyapp.Interfaces.Listeners.OnArtistClickListener;
 import com.app.spotifyapp.Interfaces.Listeners.OnSearchClickListener;
-import com.app.spotifyapp.Models.ArtistDAO;
 import com.app.spotifyapp.Models.SearchDAO;
 import com.app.spotifyapp.R;
 import com.squareup.picasso.Picasso;
@@ -20,12 +17,10 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<SearchRecyclerViewAdapter.ViewHolder>{
-    private Context context;
     private ArrayList<SearchDAO> data;
     private final OnSearchClickListener _listener;
 
-    public SearchRecyclerViewAdapter(Context context, ArrayList<SearchDAO> data, OnSearchClickListener listener){
-        this.context = context;
+    public SearchRecyclerViewAdapter(ArrayList<SearchDAO> data, OnSearchClickListener listener){
         this.data = data;
         this._listener = listener;
     }
@@ -63,9 +58,6 @@ public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<SearchRecycl
     public int getItemCount() {
         return data.size();
     }
-
-
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView name;

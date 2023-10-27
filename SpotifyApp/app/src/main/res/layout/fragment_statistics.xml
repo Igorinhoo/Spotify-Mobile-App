@@ -5,15 +5,41 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.StatisticsFragment">
 
-    <RelativeLayout
-        android:id="@+id/tx"
+    <TextView
+        android:id="@+id/tvTitleStatistics"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:text="Get Top"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:paddingTop="10dp"
+        />
+
+    <ImageButton
+        android:id="@+id/btnStatisticsSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/settings"
+        android:paddingTop="15dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:backgroundTint="@android:color/transparent"/>
+
+    <RelativeLayout
+        android:id="@+id/chooseSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitleStatistics">
+
         <Button
             android:id="@+id/tracks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"
             android:text="Tracks"/>
 
 
@@ -22,15 +48,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="Artists" />
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/white"
+            android:backgroundTint="#6E6E6E"
+            android:text="Artists"
+            android:layout_gravity="center"/>
     </RelativeLayout>
 
 
     <LinearLayout
-        android:id="@+id/xxxxxxx"
+        android:id="@+id/statisticsDisplay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tx"
+        android:layout_below="@+id/chooseSection"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -41,7 +71,7 @@
             />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/topItemsRecycler"
+            android:id="@+id/topAlbumsRecycler"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             tools:listitem="@layout/top_artists"

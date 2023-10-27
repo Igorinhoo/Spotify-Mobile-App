@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class PlaylistTrackListFragment extends Fragment {
 
-    String PlaylistID;
+    private String PlaylistID;
     private FragmentPlaylistTrackListBinding _binding;
     private PlaylistsAPIProvider api;
     private SpotifyAppRemote _SpotifyAppRemote;
@@ -81,49 +81,47 @@ public class PlaylistTrackListFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         _binding.rvPlaylistTrackList.setLayoutManager(linearLayoutManager);
 
-        adapter = new TracksRecyclerViewAdapter(requireContext(), tracks, new OnTrackClickListener() {
-                    @Override
-                    public void onItemClick(TrackDAO track) {
-                        if (_SpotifyAppRemote != null) {
-                            _SpotifyAppRemote.getPlayerApi().play("spotify:track:" + track.Id);
-                            Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
-                            intent.putExtra("TrackHref", track.Id);
-                            startActivity(intent);
-                        }
-                        Toast.makeText(requireContext(), track.Name, Toast.LENGTH_LONG).show();
-                    }
 
-                    @Override
-                    public void onLongClick(TrackDAO track) {
-                        ShowDialog(track);
-//                        Toast.makeText(requireContext(), "LONG CLICK", Toast.LENGTH_LONG).show();
+        // TODO: 8/20/2023 Try to do that every recycler view don't have to get new data from API, but it has to be stored for some time
+        adapter = new TracksRecyclerViewAdapter(tracks, new OnTrackClickListener() {
+            @Override
+            public void onItemClick(TrackDAO track, int pos) {
+                if (_SpotifyAppRemote != null) {
+                    _SpotifyAppRemote.getPlayerApi().skipToIndex("spotify:playlist:" + PlaylistID, pos);
+                    Intent intent = new Intent(getActivity(), PlayTrackActivity.class);
+                    intent.putExtra("TrackHref", track.Id);
+                    startActivity(intent);
+                }
+                Toast.makeText(requireContext(), track.Name, Toast.LENGTH_LONG).show();
+            }
 
-                    }
-                });
+            @Override
+            public void onLongClick(TrackDAO track) {
+                ShowRemoveDialog(track);
+            }
+        });
         _binding.rvPlaylistTrackList.setAdapter(adapter);
 
         try {
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                api.GetPlaylistItems(PlaylistID, trackListData -> {
-                    requireActivity().runOnUiThread(() -> {
-                        tracks.clear();
-                        tracks.addAll(trackListData);
-                        adapter.UpdateData(trackListData);
-                        adapter.notifyDataSetChanged();
-                    });
-                });
-            }, 1000);
+            new Handler(Looper.getMainLooper()).postDelayed(() ->
+                    api.GetPlaylistItems(PlaylistID, trackListData ->
+                            requireActivity().runOnUiThread(() -> {
+                                tracks.clear();
+                                tracks.addAll(trackListData);
+                                adapter.UpdateData(trackListData);
+                                adapter.notifyDataSetChanged();
+                            })), 1000);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private void ShowDialog(TrackDAO track){
-        Dialog dialog = new Dialog(requireContext());
+    private void ShowRemoveDialog(TrackDAO track){
+        Dialog dialog = new Dialog(requireContext(), R.style.CustomButtonsDialog);
         dialog.setContentView(R.layout.playlist_dialog);
 
         Button remove = dialog.findViewById(R.id.btn_remove);
-        remove.setOnClickListener(view -> {
+        remove.setOnClickListener(view ->
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 api.GetPlaylist(PlaylistID, albumData -> {
                     try {
@@ -137,44 +135,13 @@ public class PlaylistTrackListFragment extends Fragment {
                     }
                 });
 
-            }, 600);
-        });
+            }, 600));
         dialog.show();
     }
 
-    /*private void ShowDialog(TrackDAO track){
-        PopupMenu popupMenu = new PopupMenu(requireContext(), _binding.rvPlaylistTrackList);
-        popupMenu.getMenuInflater().inflate(R.menu.playlist_dialog, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(menuItem -> {
-            switch (menuItem.getItemId()){
-                case R.id.remove:
-                    new Handler().postDelayed(() -> {
-                        api.GetPlaylist(PlaylistID, albumData -> {
-                            Log.e("onLongClick: .", albumData.Name + " +" + albumData.snapshotID);
-                            try {
-                                tracks.remove(track);
-                                UpdateRecycler(tracks);
-                                api.RemoveFromPlaylist(PlaylistID, albumData.snapshotID, new String[]{"spotify:track:"+track.Uri});
-                            }catch (Exception e){
-                                Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                    }, 1000);
-
-                    break;
-
-            }
-            return false;
-        });
-        popupMenu.show();*//*
-
-
-    }*/
-
     private void UpdateRecycler(ArrayList<TrackDAO> NewTracks){
-            adapter.UpdateData(NewTracks);
-            adapter.notifyDataSetChanged();
+        adapter.UpdateData(NewTracks);
+        adapter.notifyDataSetChanged();
     }
     @Override
     public void onDestroyView() {
