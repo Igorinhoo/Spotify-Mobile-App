@@ -70,12 +70,12 @@ public class PlaylistTrackListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        _binding.btnPlayPlaylist.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().play("spotify:playlist:" + PlaylistID));
+        _binding.btnPlayPlaylist.setOnClickListener(view -> _SpotifyAppRemote.getPlayerApi().skipToIndex("spotify:playlist:" + PlaylistID, 0));
 
         GetTrackList();
     }
 
-    void GetTrackList(){
+    private void GetTrackList(){
         tracks = new ArrayList<>();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
