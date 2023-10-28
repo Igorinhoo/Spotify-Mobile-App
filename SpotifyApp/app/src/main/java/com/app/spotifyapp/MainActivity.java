@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         CheckIfFirstRun();
 
-
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
         NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
 
@@ -131,8 +130,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (isFirstRun) {
             startActivity(new Intent(MainActivity.this, GenresActivity.class));
-            Toast.makeText(MainActivity.this, "First Run", Toast.LENGTH_LONG)
-                    .show();
         }
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("isFirstRun", false).apply();
