@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.app.spotifyapp.Interfaces.Callbacks.ArtistDataCallback;
 import com.app.spotifyapp.Models.ArtistDAO;
+import com.app.spotifyapp.Models.ArtistFirebaseDAO;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,8 +45,8 @@ public class FirebaseRepo {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data:dataSnapshot.getChildren()
                 ) {
-                    ArtistDAO artist = data.getValue(ArtistDAO.class);
-                    artists.add(artist);
+                    ArtistFirebaseDAO artist = data.getValue(ArtistFirebaseDAO.class);
+                    artists.add(Objects.requireNonNull(artist).ChangeFirebaseToBase());
                     Log.e("TAG", "Data: " + Objects.requireNonNull(artist).Name);
                 }
                 callback.onArtistsDataReceived(artists);
