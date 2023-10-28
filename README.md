@@ -109,5 +109,12 @@ Korzysta z:
     <img src="https://github.com/Igorinhoo/Spotify-Mobile-App/blob/main/img/13.jpg" style="height: 600px"/>
 </div>
 
+<div>
+    <h3>
+        Gdy użytkownik znajduję się w trybie offline w aplikacji Spotify, nie ma dostępu do zakładki ze statystykami oraz playlistami.    
+    </h3>
+    <img src="https://github.com/Igorinhoo/Spotify-Mobile-App/blob/main/img/14.jpg" style="height: 600px"/>
+</div>
+
 <h2>Aplikacja stworzona przez Igora Gibasa</h2>
 </div>
