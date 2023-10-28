@@ -68,6 +68,33 @@ public class StatisticsFragment extends Fragment{
         return _binding.getRoot();
     }
 
+    private void GetStatistics(int value){
+        StatisticsTerm term = StatisticsTerm.LONG_TERM;
+        switch (value){
+            case 0:
+                term = StatisticsTerm.SHORT_TERM;
+                break;
+            case 1:
+                term = StatisticsTerm.MEDIUM_TERM;
+                break;
+        }
+
+        api.getTopTracks(MainActivity.getAccessToken(), term, trackData -> requireActivity().runOnUiThread(() -> {
+            TrackData.clear();
+            TrackData.addAll(trackData);
+            adapterTracks.UpdateData(TrackData);
+            adapterTracks.notifyDataSetChanged();
+            _binding.topAlbumsRecycler.scrollToPosition(0);
+        }));
+        api.getTopArtists(MainActivity.getAccessToken(), term, artistsData -> requireActivity().runOnUiThread(() -> {
+            ArtistData.clear();
+            ArtistData.addAll(artistsData);
+            adapterArtists.UpdateData(ArtistData);
+            adapterArtists.notifyDataSetChanged();
+            _binding.topTracksRecycler.scrollToPosition(0);
+        }));
+    }
+
     private void GetStatistics(){
         int value = requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getInt("statsTerm", 2);
@@ -105,28 +132,22 @@ public class StatisticsFragment extends Fragment{
         Button medium_term = dialog.findViewById(R.id.btn_medium_term);
         Button long_term = dialog.findViewById(R.id.btn_long_term);
 
-        short_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
-        medium_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
-        long_term.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
+        Button[] termButtons = {short_term, medium_term, long_term};
+        for (int i = 0; i < 3; i++) {
+            final int finalI = i;
 
-        short_term.setOnClickListener(view -> {
-            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                    .edit().putInt("statsTerm", 0).apply();
-            GetStatistics();
-            dialog.dismiss();
-        });
-        medium_term.setOnClickListener(view -> {
-            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                    .edit().putInt("statsTerm", 1).apply();
-            GetStatistics();
-            dialog.dismiss();
-        });
-        long_term.setOnClickListener(view -> {
-            requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                    .edit().putInt("statsTerm", 2).apply();
-            GetStatistics();
-            dialog.dismiss();
-        });
+            int value = requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                    .getInt("statsTerm", 2);
+            if (i == value) termButtons[i].setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.basic));
+            else termButtons[i].setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.buttons));
+
+            termButtons[i].setOnClickListener(view -> {
+                requireActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                        .edit().putInt("statsTerm", finalI).apply();
+                GetStatistics(finalI);
+                dialog.dismiss();
+            });
+        }
         dialog.show();
     }
     @Override
